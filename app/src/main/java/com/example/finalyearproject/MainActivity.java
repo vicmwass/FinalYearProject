@@ -1,9 +1,10 @@
 package com.example.finalyearproject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,21 +12,50 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
-    private DomainsAdapter mAdapter;
+
     public static final String IDLIST="idList";
-    private RecyclerView mRecyclerView;
+    public SharedViewModel mViewModel;
+    ArrayList<String> mIdList;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseUtils.openFirebaseReference(this);
         setContentView(R.layout.activity_main);
-//        FirebaseUtils.openFirebaseReference(this);
-        mRecyclerView = findViewById(R.id.domain_recyler_view);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        mAdapter = new DomainsAdapter();
-        mRecyclerView.setAdapter(mAdapter);
+
+        mViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
+        mViewModel.getIdList().observe(this, new Observer<ArrayList<String>>() {
+            @Override
+            public void onChanged(@Nullable ArrayList<String> idList) {
+                mIdList=idList;
+            }
+        });
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.domains_frame, new DomainListFragment())
+                .add(R.id.notices_frame, new NoticeListFragment())
+                .commit();
+
+
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FirebaseUtils.attachListener();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        FirebaseUtils.detachListener();
     }
 
     @Override
@@ -38,10 +68,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-            case R.id.menu_domains:
-                Intent intent=new Intent(this, AddDomain.class);
-                intent.putExtra(IDLIST,mAdapter.mIdList);
-                startActivity(intent);
+            case R.id.to_new_domains:
+                Intent DIntent=new Intent(this, AddDomain.class);
+                DIntent.putExtra(IDLIST, mIdList);
+                startActivity(DIntent);
+                break;
+            case R.id.to_new_notice:
+                Intent NIntent =new Intent(this,AddNotice.class);
+                NIntent.putExtra(IDLIST, mIdList);
+                startActivity(NIntent);
                 break;
 
         }
@@ -50,11 +85,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        int sz =mAdapter.mIdList.size();
+        int sz = mIdList.size();
         if(sz>0){
-            mAdapter.mIdList.remove(sz-1);
-            mAdapter.populateArray();
-            mAdapter.notifyDataSetChanged();
+            mIdList.remove(sz-1);
+            mViewModel.setIdList(mIdList);
         }else{
             super.onBackPressed();
         }

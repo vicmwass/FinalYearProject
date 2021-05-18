@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -22,22 +21,22 @@ import java.util.ArrayList;
 
 public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsViewHolder> {
     ArrayList<Domain> mDomainList=new ArrayList<Domain>();
-    ArrayList <String> mIdList = new ArrayList<String>();
+    ArrayList<String> mIdList = new ArrayList<String>();
+    SharedViewModel mViewModel;
     private CollectionReference mDomainsRef;
 //    private DocumentReference mDocDomainRef;
 
-    public DomainsAdapter(){
-        populateArray();
+    public DomainsAdapter( SharedViewModel viewModel){
+        this.mViewModel=viewModel;
     }
 
     public void populateArray() {
         mDomainList.clear();
         mDomainsRef = FirebaseUtils.mFireStore.collection("domains");
         if(mIdList.size()>0){
-            for(String Id:mIdList){
+             for(String Id:mIdList){
                 mDomainsRef = mDomainsRef.document(Id).collection("domains");
             }
-
         }
 
         mDomainsRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -69,6 +68,11 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
         });
 
     }
+    public void populataData(ArrayList<String> idList){
+        this.mIdList=idList;
+        populateArray();
+        notifyDataSetChanged();
+    }
 
     @Override
     public DomainsViewHolder onCreateViewHolder(@NonNull  ViewGroup parent, int viewType) {
@@ -85,8 +89,8 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
             @Override
             public void onClick(View v) {
                 mIdList.add(lDomain.getId());
-                DomainsAdapter.this.populateArray();
-                DomainsAdapter.this.notifyDataSetChanged();
+                mViewModel.setIdList(mIdList);
+
             }
         });
 

@@ -4,6 +4,7 @@ public class Domain {
     private String name;
     private String id;
 
+
     public String getName() {
         return name;
     }
