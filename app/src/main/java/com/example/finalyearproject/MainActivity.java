@@ -3,14 +3,19 @@ package com.example.finalyearproject;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager.widget.ViewPager;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TableLayout;
+
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 
@@ -18,9 +23,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static final String IDLIST="idList";
+    public static final String DNAME="domainN";
+    public static final String NOTICE="notice";
     public SharedViewModel mViewModel;
     ArrayList<String> mIdList;
-
+    String mDomainName;
+    private ViewPager mViewPager;
+    private TabLayout mTabLayout;
+    private ViewPageAdapter mViewPageAdapter;
+    private Toolbar mToolbar;
 
 
     @Override
@@ -36,10 +47,27 @@ public class MainActivity extends AppCompatActivity {
                 mIdList=idList;
             }
         });
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.domains_frame, new DomainListFragment())
-                .add(R.id.notices_frame, new NoticeListFragment())
-                .commit();
+        mViewModel.getDomainName().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                mDomainName=s;
+
+            }
+        });
+        mToolbar = findViewById(R.id.toolbar);
+         setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
+
+        mViewPager = findViewById(R.id.pager);
+        mTabLayout = findViewById(R.id.tab_layout);
+        mViewPageAdapter = new ViewPageAdapter(getSupportFragmentManager(),0);
+        mTabLayout.setupWithViewPager(mViewPager);
+        mViewPager.setAdapter(mViewPageAdapter);
+
+//        getSupportFragmentManager().beginTransaction()
+//                .add(R.id.domains_frame, new DomainListFragment())
+//                .add(R.id.notices_frame, new NoticeListFragment())
+//                .commit();
 
 
 
@@ -76,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.to_new_notice:
                 Intent NIntent =new Intent(this,AddNotice.class);
                 NIntent.putExtra(IDLIST, mIdList);
+                NIntent.putExtra(DNAME,mDomainName);
                 startActivity(NIntent);
                 break;
 

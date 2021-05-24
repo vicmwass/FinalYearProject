@@ -90,6 +90,7 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
             public void onClick(View v) {
                 mIdList.add(lDomain.getId());
                 mViewModel.setIdList(mIdList);
+                mViewModel.setDomainName(lDomain.getName());
 
             }
         });

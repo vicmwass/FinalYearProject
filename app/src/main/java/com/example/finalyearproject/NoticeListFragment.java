@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
 
@@ -19,6 +20,8 @@ public class NoticeListFragment extends Fragment {
     private RecyclerView mNoticeRecyclerView;
     private NoticeAdapter mNoticeAdapter;
     private SharedViewModel mViewModel;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private ArrayList<String> mIdList=new ArrayList<String>();
 
 
 
@@ -31,6 +34,16 @@ public class NoticeListFragment extends Fragment {
         mNoticeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mNoticeAdapter = new NoticeAdapter(getContext());
         mNoticeRecyclerView.setAdapter(mNoticeAdapter);
+        mSwipeRefreshLayout = lView.findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mNoticeAdapter.populateData(mIdList);
+                mNoticeAdapter.notifyDataSetChanged();
+                mSwipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
         return lView;
     }
     @Override
@@ -42,6 +55,7 @@ public class NoticeListFragment extends Fragment {
         mViewModel.getIdList().observe(getActivity(), new Observer<ArrayList<String>>() {
             @Override
             public void onChanged(@Nullable ArrayList<String> idList) {
+                mIdList=idList;
                 mNoticeAdapter.populateData(idList);
                 mNoticeAdapter.notifyDataSetChanged();
             }

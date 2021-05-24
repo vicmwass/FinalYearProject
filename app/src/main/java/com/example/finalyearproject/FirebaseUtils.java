@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -66,7 +67,7 @@ public class FirebaseUtils {
                 @Override
                 public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                     if (mFirebaseAuth.getCurrentUser() == null) {
-                        FirebaseUtils.signIn();
+                        signIn();
                     }
                     Log.d("Auth", "Listener");
                 }
@@ -173,7 +174,7 @@ public class FirebaseUtils {
     public static Notice saveNoticeFile(Uri fileUri, Notice notice){
         mFirebaseStorage= FirebaseStorage.getInstance();
         mStorageRef=mFirebaseStorage.getReference().child("notice_files");
-        final StorageReference ref = mStorageRef.child(fileUri.getLastPathSegment());
+        final StorageReference ref = mStorageRef.child(notice.getFileName());
         ref.putFile(fileUri).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
             @Override
             public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
@@ -182,12 +183,7 @@ public class FirebaseUtils {
                     throw task.getException();
 
                 }
-                ref.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-                    @Override
-                    public void onSuccess(StorageMetadata storageMetadata) {
-                        notice.setFileName(storageMetadata.getName());
-                    }
-                });
+
                 return ref.getDownloadUrl();
             }
         }).addOnCompleteListener(new OnCompleteListener<Uri>() {
@@ -205,53 +201,59 @@ public class FirebaseUtils {
 
     }
 
+    public static void deleteFile(Notice notice){
+        mFirebaseStorage= FirebaseStorage.getInstance();
+        if(notice.getFileUrl()!=null){
+            StorageReference reference = mFirebaseStorage.getReferenceFromUrl(notice.getFileUrl());
+            reference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                }
+            });
+        }
 
+
+
+    }
 
     public static void saveFileLocally(Context context,Notice notice){
         mFirebaseStorage= FirebaseStorage.getInstance();
         StorageReference reference = mFirebaseStorage.getReferenceFromUrl(notice.getFileUrl());
         askPermissions(context);
-            File storagePath = new File(Environment.getExternalStorageDirectory(),"Notice_Files");
+            File storagePath = new File(context.getExternalFilesDir(""),"Notice_Files");
         if(!storagePath.exists()) {
             storagePath.mkdir();
         }
-        final String[] name = new String[2];
-        final String[] type = new String[1];
+        final String[] type = new String[2];
 
 
         reference.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
             @Override
             public void onSuccess(StorageMetadata storageMetadata) {
-                name[0]= "docx";
                 type[0] =storageMetadata.getContentType().split("/")[0];
-//                name[1] =notice.getFileName().split(".")[1];
+                type[1]=storageMetadata.getContentType().split("/")[1];
+                String mime = type[0]+"/"+type[1];
 
-                // Metadata now contains the metadata for 'images/forest.jpg'
-
-
-//                    File localFile = File.createTempFile(name[0], name[1]);
                       final File localFile = new File(storagePath, notice.getFileName());
                       if(localFile.exists()){
-                          Uri uri= Uri.parse(localFile.getAbsolutePath());
-                          String mime = type[0]+"/"+"*";
+                          Uri uri= FileProvider.getUriForFile(context,context.getApplicationContext().getPackageName()+".provider",localFile);
                           Intent lIntent=new Intent();
                           lIntent.setAction(Intent.ACTION_VIEW);
                           lIntent.setDataAndType(uri,mime);
                           lIntent.setFlags(FLAG_GRANT_READ_URI_PERMISSION | FLAG_GRANT_WRITE_URI_PERMISSION);
                           context.startActivity(Intent.createChooser(lIntent,"Open File"));
-
                       }else {
-
-
-
                           reference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                               @Override
                               public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                  // Local temp file has been created
-//                    Toast.makeText(context,"file downloaded",Toast.LENGTH_LONG).show();
+                                  Uri uri= FileProvider.getUriForFile(context,context.getApplicationContext().getPackageName()+".provider",localFile);
                                   Log.d("saveFileLocally", "file downloaded");
-                                  Uri uri = Uri.parse(localFile.getAbsolutePath());
-                                  String mime = type[0]+"/"+"*";
                                   Intent lIntent = new Intent();
                                   lIntent.setAction(Intent.ACTION_VIEW);
                                   lIntent.setDataAndType(uri, mime);
@@ -277,7 +279,6 @@ public class FirebaseUtils {
             }
         });
 
-//        String extension = reference.getName().split(".")[1];
 
     }
 

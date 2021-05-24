@@ -1,70 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AddNotice">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Sender of notice"
-        android:textSize="16sp"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:theme="@style/Theme.FinalYearProject"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/et_sender"
-        android:layout_width="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+         />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/wraper_et_sender"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        android:layout_marginTop="@dimen/margin_to_top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        android:layout_marginStart="@dimen/margin_start"
+        android:layout_marginEnd="@dimen/margin_start">
+        <EditText
+            android:id="@+id/et_sender"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Enter Sender Name"
+            android:maxLines="1"
+            android:inputType="text"
+            android:textAlignment="viewStart"
+            android:layout_margin="@dimen/edit_text_margin"
+            android:singleLine="true"
+            />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/wraper_et_subject"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Subject"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@+id/et_sender"
-        app:layout_constraintTop_toBottomOf="@+id/et_sender" />
-
-    <EditText
-        android:id="@+id/et_subject"
-        android:layout_width="wrap_content"
+        android:layout_marginTop="@dimen/margin_to_top_view"
+        app:layout_constraintStart_toStartOf="@+id/wraper_et_sender"
+        app:layout_constraintTop_toBottomOf="@+id/wraper_et_sender"
+        android:layout_marginStart="@dimen/margin_start"
+        android:layout_marginEnd="@dimen/margin_start">
+        <EditText
+            android:id="@+id/et_subject"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/multiline_et_height"
+            android:hint="Enter Subject"
+            android:layout_margin="@dimen/edit_text_margin"
+            android:inputType="textMultiLine"
+            android:textAlignment="viewStart"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/wraper_et_description"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
-        app:layout_constraintStart_toStartOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        android:layout_marginTop="@dimen/margin_to_top_view"
+        app:layout_constraintStart_toStartOf="@+id/wraper_et_subject"
+        app:layout_constraintTop_toBottomOf="@+id/wraper_et_subject"
+        android:layout_marginStart="@dimen/margin_start"
+        android:layout_marginEnd="@dimen/margin_start">
+        <EditText
+            android:id="@+id/et_description"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/multiline_et_height"
+            android:hint="Enter description"
+            android:inputType="textMultiLine"
+            android:textAlignment="viewStart"
+            android:layout_margin="@dimen/edit_text_margin"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:id="@+id/tv_upload_file"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Upload file"
+        android:layout_marginTop="@dimen/margin_to_top_view"
         android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="@+id/et_subject"
-        app:layout_constraintTop_toBottomOf="@+id/et_subject" />
+        android:layout_marginStart="@dimen/margin_start"
+        android:layout_marginEnd="@dimen/margin_start"
+        app:layout_constraintStart_toStartOf="@+id/wraper_et_description"
+        app:layout_constraintTop_toBottomOf="@+id/wraper_et_description" />
 
     <Button
         android:id="@+id/upload_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="upload"
+        android:layout_marginTop="@dimen/margin_to_top_view"
+        android:text="add file"
         app:layout_constraintStart_toStartOf="@+id/tv_upload_file"
-        app:layout_constraintTop_toBottomOf="@+id/tv_upload_file" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_upload_file"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

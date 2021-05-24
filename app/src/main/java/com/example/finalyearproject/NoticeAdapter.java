@@ -1,11 +1,13 @@
 package com.example.finalyearproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -89,13 +91,30 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
         Notice lNotice = mNoticeList.get(position);
         holder.tvSender.setText(lNotice.getSender());
         holder.tvSubject.setText(lNotice.getSubject());
-        holder.tvFile.setText(lNotice.getFileName());
-        holder.button.setOnClickListener(new View.OnClickListener() {
+        holder.rlCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseUtils.saveFileLocally(mContext,lNotice);
+                Intent lIntent=new Intent(mContext,NoticeActivity.class);
+                lIntent.putExtra(MainActivity.NOTICE,lNotice);
+                mContext.startActivity(lIntent);
             }
         });
+        if(lNotice.getDescription()!=null){
+            holder.tvDescription.setVisibility(View.VISIBLE);
+            holder.tvDescription.setText(lNotice.getDescription());
+        }else{
+            holder.tvDescription.setVisibility(View.INVISIBLE);
+        }
+
+        if(lNotice.getDomainName()==null){
+            holder.tvFrom.setVisibility(View.INVISIBLE);
+            holder.tvFromDomain.setVisibility(View.INVISIBLE);
+        }else{
+            holder.tvFrom.setVisibility(View.VISIBLE);
+            holder.tvFromDomain.setVisibility(View.VISIBLE);
+            holder.tvFromDomain.setText(lNotice.getDomainName());
+        }
+
 
     }
 
@@ -107,15 +126,21 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
     public class NoticeViewHolder extends RecyclerView.ViewHolder {
         TextView tvSender;
         TextView tvSubject;
-        TextView tvFile;
+        TextView tvDescription;
         Button button;
+        RelativeLayout rlCard;
+        TextView tvFrom;
+        TextView tvFromDomain;
 
         public NoticeViewHolder(@NonNull View itemView) {
             super(itemView);
             tvSender=itemView.findViewById(R.id.tv_sender);
             tvSubject=itemView.findViewById(R.id.tv_subject);
-            tvFile=itemView.findViewById(R.id.tv_file);
-            button=itemView.findViewById(R.id.notice_download_button);
+            tvDescription=itemView.findViewById(R.id.tv_description);
+            rlCard=itemView.findViewById(R.id.notice_card);
+            tvFrom = itemView.findViewById(R.id.tv_from);
+            tvFromDomain = itemView.findViewById(R.id.tv_from_domain_name);
+//            button=itemView.findViewById(R.id.notice_download_button);
         }
     }
 

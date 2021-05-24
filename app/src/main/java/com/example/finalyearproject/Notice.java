@@ -1,11 +1,15 @@
 package com.example.finalyearproject;
 
-public class Notice {
+import java.io.Serializable;
+
+public class Notice implements Serializable {
 
     private String sender;
     private String subject;
     private String fileUrl;
     private String fileName;
+    private String domainName;
+    private String description;
     private String Id;
 
     public String getSender() {
@@ -46,6 +50,22 @@ public class Notice {
 
     public void setId(String id) {
         Id = id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDomainName() {
+        return domainName;
+    }
+
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
     }
 
     public Notice withId(String Id){

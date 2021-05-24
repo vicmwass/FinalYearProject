@@ -2,6 +2,8 @@ package com.example.finalyearproject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,13 +14,14 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
 public class AddDomain extends AppCompatActivity {
 
 
     private EditText mEtDomainName1;
     private ArrayList<String> mIdList;
+    private Toolbar mToolbar;
+    private Domain mDomain;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +30,11 @@ public class AddDomain extends AppCompatActivity {
         mEtDomainName1 = findViewById(R.id.et_domain_name);
         Intent myIntent=getIntent();
         mIdList = myIntent.getStringArrayListExtra(MainActivity.IDLIST);
-        
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
+        mDomain = new Domain();
+
     }
 
     @Override
@@ -36,25 +43,25 @@ public class AddDomain extends AppCompatActivity {
         inflater.inflate(R.menu.new_domain,menu);
         return true;
     }
-    private Domain getDetails(){
+    private boolean saveDetails(){
         String name=mEtDomainName1.getText().toString().trim();
-        Domain domain = new Domain();
-        if(!name.equals("")){
-            domain.setName(name);
+        if(name.length() == 0){
+            mEtDomainName1.setError("name is Required");
+            mEtDomainName1.requestFocus();
+            return false;
         }
-        return domain;
+        mDomain.setName(name);
+        return true;
+
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.save_domain:
-                Domain lDomain = getDetails();
-                if (lDomain != null) {
-                    FirebaseUtils.saveDomain(lDomain,this,mIdList);
+                if(saveDetails()){
+                    FirebaseUtils.saveDomain(mDomain,this,mIdList);
                     finish();
-                }else{
-                    Toast.makeText(this,"Could not add",Toast.LENGTH_LONG).show();
                 }
                 break;
         }

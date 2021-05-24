@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_margin">10dp</dimen>
+    <dimen name="margin_to_top">16dp</dimen>
+    <dimen name="margin_to_top_view">10dp</dimen>
+    <dimen name="margin_start">5dp</dimen>
+    <dimen name="edit_text_margin">16dp</dimen>
+    <dimen name="multiline_et_height">95dp</dimen>
+</resources>
