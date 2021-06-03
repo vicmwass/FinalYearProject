@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -41,8 +42,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TabLayout mTabLayout;
     private ViewPageAdapter mViewPageAdapter;
     private Toolbar mToolbar;
-    private NavigationView navigationView;
-    private DrawerLayout drawerLayout;
+    private NavigationView mNavigationView;
+    private DrawerLayout mDrawerLayout;
     private String mInstCode;
     private Boolean finalExit=false;
 
@@ -86,19 +87,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(R.string.app_name);
 
-        drawerLayout=findViewById(R.id.drawer_layout);
-        navigationView=findViewById(R.id.nav_view);
+        mDrawerLayout =findViewById(R.id.drawer_layout);
+        mNavigationView =findViewById(R.id.nav_view);
 
 
-        navigationView.bringToFront();//when navdrawer items clicked show that color to represent click
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
+        mNavigationView.bringToFront();//when navdrawer items clicked show that color to represent click
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+        mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         //to make navigation drawer clickable
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView.setNavigationItemSelectedListener(this);
 
-        navigationView.setCheckedItem(R.id.nav_home);
+        mNavigationView.setCheckedItem(R.id.nav_home);
     }
 
     private void setupViewModel() {
@@ -186,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 lIntent.putExtra(IDLIST, mIdList);
                 lIntent.putExtra("InstitutionCode", mInstCode);
                 startActivity(lIntent);
+                mDrawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.to_new_domains:
                 Intent DIntent=new Intent(this, AddDomain.class);
@@ -193,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 DIntent.putExtra("InstitutionCode", mInstCode);
                 DIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
                 startActivity(DIntent);
+                mDrawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.to_new_notice:
                 Intent NIntent =new Intent(this,AddNotice.class);
@@ -200,9 +203,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 NIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
                 NIntent.putExtra("InstitutionCode", mInstCode);
                 startActivity(NIntent);
+                mDrawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.choose_institution:
                 chooseInstitution();
+                mDrawerLayout.closeDrawer(GravityCompat.START);
                 break;
 
         }
@@ -225,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             lIntent.putExtra("InstitutionCode", mInstCode);
                             lIntent.putExtra("institutionList",lInst);
                             startActivity(lIntent);
-                            finish();
+
                         }
 
                     }
