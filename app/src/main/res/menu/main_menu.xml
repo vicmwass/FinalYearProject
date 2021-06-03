@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/home_24"
+            android:title="Home" />
+        <item
+            android:id="@+id/to_new_domains"
+            android:icon="@drawable/add_24"
+            android:title="Add Subdomain" />
+        <item
+            android:id="@+id/to_new_notice"
+            android:icon="@drawable/send_24"
+            android:title="Send Notice" />
+        <item
+            android:id="@+id/choose_institution"
+            android:icon="@drawable/domain_24"
+            android:title="Change Domain" />
+
+    </group>
+
+<!--    <item android:title="Account">-->
+<!--        <menu>-->
+<!--            <group android:checkableBehavior="single">-->
+<!--                <item-->
+<!--                    android:id="@+id/nav_login"-->
+<!--                    android:icon="@drawable/login_icon"-->
+<!--                    android:title="Login" />-->
+<!--                <item-->
+<!--                    android:id="@+id/nav_profile"-->
+<!--                    android:icon="@drawable/profile_icon"-->
+<!--                    android:title="Profile" />-->
+<!--                <item-->
+<!--                    android:id="@+id/nav_logout"-->
+<!--                    android:icon="@drawable/logout"-->
+<!--                    android:title="Logout" />-->
+<!--            </group>-->
+<!--        </menu>-->
+<!--    </item>-->
+
+</menu>

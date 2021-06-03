@@ -1,23 +1,28 @@
 package com.example.finalyearproject;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
+import android.util.Log;
 import android.view.MenuItem;
-import android.widget.EditText;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -26,32 +31,35 @@ import java.util.ArrayList;
 import static com.example.finalyearproject.MainActivity.DNAME;
 import static com.example.finalyearproject.MainActivity.IDLIST;
 
-public class AddDomain extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class ChooseInstitution extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-
-    private EditText mEtDomainName1;
-    private ArrayList<String> mIdList;
+    private InstitutionAdapter mInstitutionAdapter;
+    private RecyclerView mInstRecycleView;
+    private ArrayList<String> mInstList;
+    ArrayList<String> mInstNameList=new ArrayList<String>();
     private Toolbar mToolbar;
-    private Domain mDomain;
-    private String mInstCode;
     private NavigationView mNavigationView;
     private DrawerLayout mDrawerLayout;
+    private ArrayList<String> mIdList;
     private String mDomainName;
+    private String mInstCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_domain);
-        mEtDomainName1 = findViewById(R.id.et_domain_name);
+        setContentView(R.layout.activity_choose_institution);
         Intent lIntent=getIntent();
-        mIdList = lIntent.getStringArrayListExtra(MainActivity.IDLIST);
+        mInstList = lIntent.getStringArrayListExtra("institutionList");
+        mIdList = lIntent.getStringArrayListExtra(IDLIST);
+        mDomainName = lIntent.getStringExtra(DNAME);
         mInstCode = lIntent.getStringExtra("InstitutionCode");
-        mDomainName=lIntent.getStringExtra(DNAME);
-        setupNavigatioView();
-        mDomain = new Domain();
+        if(mInstCode!=null){
+            setupNavigatioView();
+        }
+//        setupAdapter();
 
+        getInstNames();
     }
-
     private void setupNavigatioView() {
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -69,40 +77,49 @@ public class AddDomain extends AppCompatActivity implements NavigationView.OnNav
         //to make navigation drawer clickable
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        mNavigationView.setCheckedItem(R.id.to_new_domains);
+        mNavigationView.setCheckedItem(R.id.choose_institution);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.new_domain,menu);
-        return true;
-    }
-    private boolean saveDetails(){
-        String name=mEtDomainName1.getText().toString().trim();
-        if(name.length() == 0){
-            mEtDomainName1.setError("name is Required");
-            mEtDomainName1.requestFocus();
-            return false;
-        }
-        mDomain.setName(name);
-        return true;
-
+    private void setupAdapter() {
+        mInstitutionAdapter = new InstitutionAdapter(this, mInstList,mInstNameList);
+        mInstRecycleView = findViewById(R.id.inst_recycler_view);
+        mInstRecycleView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mInstRecycleView.setAdapter(mInstitutionAdapter);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.save_domain:
-                if(saveDetails()){
-                    FirebaseUtils.saveDomain(mInstCode,mDomain,this,mIdList);
-                    finish();
+    private void getInstNames() {
+             FirebaseUtils.FIRESTORE.collection(FirebaseUtils.INSTITUTIONS).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                    if (error != null) {
+                        Log.e("SnapshotListener", error.getMessage());
+                        return;
+                    }
+                    if(value.getDocumentChanges().size()>0) {
+
+                        for (DocumentChange dc : value.getDocumentChanges()) {
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    String id = dc.getDocument().getId();
+                                    Institution lInst= dc.getDocument().toObject(Institution.class);
+                                    if(mInstList.contains(lInst.getCode())){
+                                        mInstNameList.add(lInst.getName());
+                                    }
+                                    break;
+                                case MODIFIED:
+                                    break;
+                                case REMOVED:
+                                    break;
+                            }
+                        }
+                        setupAdapter();
+                    }
                 }
-                break;
-        }
-        return super.onOptionsItemSelected(item);
+            });
+
     }
 
+    @Override
     public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.nav_home:
@@ -135,7 +152,6 @@ public class AddDomain extends AppCompatActivity implements NavigationView.OnNav
         }
         return true;
     }
-
     private void chooseInstitution() {
         FirebaseUtils.FIRESTORE.collection(FirebaseUtils.USERS)
                 .document(FirebaseUtils.sFirebaseAuth.getUid()).get()
@@ -146,17 +162,18 @@ public class AddDomain extends AppCompatActivity implements NavigationView.OnNav
                             DocumentSnapshot lSnapshot=task.getResult();
                             User lUser=lSnapshot.toObject(User.class).withId(lSnapshot.getId());
                             ArrayList<String> lInst=lUser.getInstitutions();
-                            Intent lIntent=new Intent(AddDomain.this,ChooseInstitution.class);
+                            Intent lIntent=new Intent(ChooseInstitution.this,ChooseInstitution.class);
                             lIntent.putExtra(IDLIST, mIdList);
                             lIntent.putExtra(DNAME, mDomainName);
                             lIntent.putExtra("InstitutionCode", mInstCode);
                             lIntent.putExtra("institutionList",lInst);
                             startActivity(lIntent);
-                            finish();
                         }
 
                     }
                 });
 
     }
+
+
 }

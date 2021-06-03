@@ -19,40 +19,34 @@
     android:layout_gravity="start"
     />
 <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddDomain">
+    tools:context=".ChooseInstitution">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
         android:theme="@style/Theme.FinalYearProject"
+
         />
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/wraper_domain_name"
-        android:layout_width="match_parent"
-        android:layout_marginTop="@dimen/margin_to_top"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar"
-        android:layout_marginStart="@dimen/margin_start"
-        android:layout_marginEnd="@dimen/margin_start"
-        >
-        <EditText
-            android:id="@+id/et_domain_name"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swiperefresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Enter Domain Name"
-            android:inputType="textNoSuggestions"
-            android:maxLines="1"
-            android:layout_margin="@dimen/edit_text_margin"
-            android:textAlignment="center"
-            android:singleLine="true"
-             />
+            android:layout_below="@+id/toolbar">
+            <ScrollView
+                android:id="@+id/top_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
 
-    </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/inst_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </ScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </RelativeLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

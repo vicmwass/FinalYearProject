@@ -2,11 +2,12 @@ package com.example.finalyearproject;
 
 import java.util.ArrayList;
 
-public class Domain {
-    private String name;
-    private String id;
-    private ArrayList<String> adminList=new ArrayList<String>();
+public class Institution {
 
+    private String name;
+    private String code;
+    private String creator;
+    private ArrayList<String> adminList=new ArrayList<String>();
 
     public String getName() {
         return name;
@@ -16,18 +17,23 @@ public class Domain {
         this.name = name;
     }
 
-
-    public String getId() {
-        return id;
+    public String getCode() {
+        return code;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setCode(String code) {
+        this.code = code;
     }
-    public Domain withId(String Id){
-        setId(Id);
-        return this;
+
+
+    public String getCreator() {
+        return creator;
     }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
     public ArrayList<String> getAdminList() {
         return adminList;
     }
@@ -38,5 +44,6 @@ public class Domain {
     public void addAdmin(String admin){
         this.adminList.add(admin);
     }
+
 
 }

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsViewHolder> {
     ArrayList<Domain> mDomainList=new ArrayList<Domain>();
     ArrayList<String> mIdList = new ArrayList<String>();
+    ArrayList<String> mDomainNameList = new ArrayList<String>();
     SharedViewModel mViewModel;
     private CollectionReference mDomainsRef;
 //    private DocumentReference mDocDomainRef;
@@ -32,7 +33,7 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
 
     public void populateArray() {
         mDomainList.clear();
-        mDomainsRef = FirebaseUtils.mFireStore.collection("domains");
+        mDomainsRef = FirebaseUtils.FIRESTORE.collection("Institutions").document(mViewModel.getInstCode().getValue()).collection("domains");
         if(mIdList.size()>0){
              for(String Id:mIdList){
                 mDomainsRef = mDomainsRef.document(Id).collection("domains");
@@ -68,6 +69,9 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
         });
 
     }
+    public void setDomainNameList(ArrayList<String> domainNameList){
+        this.mDomainNameList=domainNameList;
+    }
     public void populataData(ArrayList<String> idList){
         this.mIdList=idList;
         populateArray();
@@ -89,8 +93,9 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
             @Override
             public void onClick(View v) {
                 mIdList.add(lDomain.getId());
+                mDomainNameList.add(lDomain.getName());
                 mViewModel.setIdList(mIdList);
-                mViewModel.setDomainName(lDomain.getName());
+                mViewModel.setDomainNameList(mDomainNameList);
 
             }
         });

@@ -11,7 +11,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalYearProject">
-        <activity android:name=".NoticeActivity"></activity>
+        <activity android:name=".ChooseInstitution"></activity>
+        <activity android:name=".RegisterForInstitution" />
+        <activity android:name=".RegisterInstitution" />
+        <activity android:name=".LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".NoticeActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -25,13 +35,7 @@
 
         <activity android:name=".AddNotice" />
         <activity android:name=".AddDomain" />
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>

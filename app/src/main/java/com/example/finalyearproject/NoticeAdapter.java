@@ -27,16 +27,18 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
     ArrayList <String> mIdList = new ArrayList<String>();
     Context mContext;
     private CollectionReference mNoticeRef;
+    SharedViewModel mViewModel;
 
-    public NoticeAdapter(Context context){
+    public NoticeAdapter(Context context, SharedViewModel viewModel){
         mContext=context;
+        this.mViewModel=viewModel;
 
         }
 
 
     private void populateArray() {
         mNoticeList.clear();
-        mNoticeRef = FirebaseUtils.mFireStore.collection("notices");
+        mNoticeRef = FirebaseUtils.FIRESTORE.collection("Institutions").document(mViewModel.getInstCode().getValue()).collection("notices");
         if(mIdList.size()>0){
                 mNoticeRef = mNoticeRef.document(mIdList.get(mIdList.size()-1)).collection("my_notices");
         }else{

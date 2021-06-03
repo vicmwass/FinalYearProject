@@ -33,7 +33,7 @@ public class ViewPageAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position){
             case 0: return "Notices";
-            case 1: return "Domains";
+            case 1: return "Subdomains";
         }
         return null;
     }

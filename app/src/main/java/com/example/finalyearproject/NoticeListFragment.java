@@ -32,7 +32,7 @@ public class NoticeListFragment extends Fragment {
         mViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
         mNoticeRecyclerView = lView.findViewById(R.id.notice_recycler_view);
         mNoticeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        mNoticeAdapter = new NoticeAdapter(getContext());
+        mNoticeAdapter = new NoticeAdapter(getContext(),mViewModel);
         mNoticeRecyclerView.setAdapter(mNoticeAdapter);
         mSwipeRefreshLayout = lView.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

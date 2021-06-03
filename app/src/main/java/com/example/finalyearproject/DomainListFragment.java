@@ -21,7 +21,7 @@ public class DomainListFragment extends Fragment {
     private DomainsAdapter mDomainsAdapter;
     private SharedViewModel mViewModel;
     private ArrayList<String> mIdList=new ArrayList<String>();
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private ArrayList<String> mDomainNameList=new ArrayList<String>();
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
 
@@ -63,7 +63,12 @@ public class DomainListFragment extends Fragment {
                 mDomainsAdapter.populataData(idList);
                 mDomainsAdapter.notifyDataSetChanged();
             }
-
+        });
+        mViewModel.getDomainNameList().observe(getViewLifecycleOwner(), new Observer<ArrayList<String>>() {
+            @Override
+            public void onChanged(ArrayList<String> domainNameList) {
+                mDomainsAdapter.setDomainNameList(domainNameList);
+            }
         });
     }
 

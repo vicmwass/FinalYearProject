@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterInstitution">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:theme="@style/Theme.FinalYearProject"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/wraper_et_inst_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_to_top"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        android:layout_marginStart="@dimen/margin_start"
+        android:layout_marginEnd="@dimen/margin_start">
+        <EditText
+            android:id="@+id/et_inst_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Enter Institution Name"
+            android:maxLines="1"
+            android:inputType="text"
+            android:textAlignment="viewStart"
+            android:layout_margin="@dimen/edit_text_margin"
+            android:singleLine="true"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+    <Button
+        android:id="@+id/btn_save_inst"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="save"
+        android:layout_marginTop="@dimen/margin_to_top_view"
+        app:layout_constraintStart_toStartOf="@+id/wraper_et_inst_name"
+        app:layout_constraintTop_toBottomOf="@+id/wraper_et_inst_name"
+    />
+<!--    <com.google.android.material.textfield.TextInputLayout-->
+<!--        android:id="@+id/wraper_et_subject"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="@dimen/margin_to_top_view"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/wraper_et_sender"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/wraper_et_sender"-->
+<!--        android:layout_marginStart="@dimen/margin_start"-->
+<!--        android:layout_marginEnd="@dimen/margin_start">-->
+<!--        <EditText-->
+<!--            android:id="@+id/et_inst_code"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="@dimen/multiline_et_height"-->
+<!--            android:hint="Enter Institution Code"-->
+<!--            android:layout_margin="@dimen/edit_text_margin"-->
+<!--            android:inputType="textMultiLine"-->
+<!--            android:textAlignment="viewStart"-->
+<!--            />-->
+<!--    </com.google.android.material.textfield.TextInputLayout>-->
+<!--    <com.google.android.material.textfield.TextInputLayout-->
+<!--        android:id="@+id/wraper_et_description"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="@dimen/margin_to_top_view"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/wraper_et_subject"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/wraper_et_subject"-->
+<!--        android:layout_marginStart="@dimen/margin_start"-->
+<!--        android:layout_marginEnd="@dimen/margin_start">-->
+<!--        <EditText-->
+<!--            android:id="@+id/et_description"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="@dimen/multiline_et_height"-->
+<!--            android:hint="Enter description"-->
+<!--            android:inputType="textMultiLine"-->
+<!--            android:textAlignment="viewStart"-->
+<!--            android:layout_margin="@dimen/edit_text_margin"-->
+<!--            />-->
+<!--    </com.google.android.material.textfield.TextInputLayout>-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,30 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:id="@+id/drawer_layout"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="start"
-    >
-
-<com.google.android.material.navigation.NavigationView
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:id="@+id/nav_view"
-    app:headerLayout="@layout/header"
-    app:menu="@menu/main_menu"
-    android:layout_gravity="start"
-    />
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".AddDomain">
+    tools:context=".RegisterForInstitution">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -33,7 +13,7 @@
         android:theme="@style/Theme.FinalYearProject"
         />
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/wraper_domain_name"
+        android:id="@+id/wraper_institution_code"
         android:layout_width="match_parent"
         android:layout_marginTop="@dimen/margin_to_top"
         android:layout_height="wrap_content"
@@ -42,17 +22,25 @@
         android:layout_marginEnd="@dimen/margin_start"
         >
         <EditText
-            android:id="@+id/et_domain_name"
+            android:id="@+id/et_institution_code"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="Enter Domain Name"
+            android:hint="Enter Institution Code"
             android:inputType="textNoSuggestions"
             android:maxLines="1"
             android:layout_margin="@dimen/edit_text_margin"
             android:textAlignment="center"
             android:singleLine="true"
-             />
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
+    <Button
+        android:id="@+id/btn_save_reg_for_inst"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_start"
+        android:text="save"
+        android:layout_marginTop="@dimen/margin_to_top_view"
+        android:layout_below="@+id/wraper_institution_code"
+/>
 </RelativeLayout>
-</androidx.drawerlayout.widget.DrawerLayout>

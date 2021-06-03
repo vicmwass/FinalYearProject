@@ -3,6 +3,7 @@ package com.example.finalyearproject;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -48,7 +49,8 @@ public class NoticeActivity extends AppCompatActivity {
             mLlOpenFile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    FirebaseUtils.saveFileLocally(getApplicationContext(),lNotice);
+                    final ProgressDialog progressDialog = new ProgressDialog(NoticeActivity.this);
+                    FirebaseUtils.saveFileLocally(NoticeActivity.this,lNotice,progressDialog);
                 }
             });
         }
