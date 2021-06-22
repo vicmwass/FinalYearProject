@@ -1,8 +1,9 @@
 package com.example.finalyearproject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Institution {
+public class Institution implements Serializable {
 
     private String name;
     private String code;

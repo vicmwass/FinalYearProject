@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.app.ProgressDialog;
@@ -31,7 +30,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -40,6 +38,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
+import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
 import static com.example.finalyearproject.MainActivity.DNAME;
 import static com.example.finalyearproject.MainActivity.IDLIST;
 
@@ -60,20 +59,44 @@ public class AddNotice extends AppCompatActivity implements NavigationView.OnNav
     private String mInstCode;
     private NavigationView mNavigationView;
     private DrawerLayout mDrawerLayout;
+    private Institution mInstDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        FirebaseUtils.signInAnonymously(this);
         setContentView(R.layout.activity_add_notice);
+        initializeViews();
+
+        setupNavigatioView();
+
+        Intent lIntent=getIntent();
+        mIdList = lIntent.getStringArrayListExtra(IDLIST);
+        mDomainName=lIntent.getStringExtra(DNAME);
+        mInstDetails = (Institution) lIntent.getSerializableExtra(INSTITUTION_DETAILS);
+        mInstCode = mInstDetails.getCode();
+        mNotice = new Notice();
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mNavigationView.setCheckedItem(R.id.to_new_notice);
+    }
+
+    private void initializeViews() {
         mEtSender = findViewById(R.id.et_sender);
         mEtSubject = findViewById(R.id.et_subject);
         mDescription = findViewById(R.id.et_description);
         mTvUpload = findViewById(R.id.tv_upload_file);
         mButton = findViewById(R.id.upload_button);
-        setupNavigatioView();
+        mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(R.string.app_name);
+
+        mDrawerLayout =findViewById(R.id.drawer_layout);
+        mNavigationView =findViewById(R.id.nav_view);
+
         mTvUpload.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -94,11 +117,6 @@ public class AddNotice extends AppCompatActivity implements NavigationView.OnNav
 
             }
         });
-        Intent lIntent=getIntent();
-        mIdList = lIntent.getStringArrayListExtra(IDLIST);
-        mDomainName=lIntent.getStringExtra(DNAME);
-        mInstCode = lIntent.getStringExtra("InstitutionCode");
-        mNotice = new Notice();
         mButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -112,14 +130,6 @@ public class AddNotice extends AppCompatActivity implements NavigationView.OnNav
     }
 
     private void setupNavigatioView() {
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
-
-        mDrawerLayout =findViewById(R.id.drawer_layout);
-        mNavigationView =findViewById(R.id.nav_view);
-
-
         mNavigationView.bringToFront();//when navdrawer items clicked show that color to represent click
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
@@ -251,59 +261,9 @@ public class AddNotice extends AppCompatActivity implements NavigationView.OnNav
 
     @Override
     public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.nav_home:
-                Intent Intent=new Intent(this, MainActivity.class);
-                Intent.putExtra(IDLIST, mIdList);
-                Intent.putExtra("InstitutionCode", mInstCode);
-                startActivity(Intent);
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.to_new_domains:
-                Intent DIntent=new Intent(this, AddDomain.class);
-                DIntent.putExtra(IDLIST, mIdList);
-                DIntent.putExtra("InstitutionCode", mInstCode);
-                startActivity(DIntent);
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.to_new_notice:
-                Intent NIntent =new Intent(this,AddNotice.class);
-                NIntent.putExtra(IDLIST, mIdList);
-                NIntent.putExtra(DNAME, mDomainName);
-                NIntent.putExtra("InstitutionCode", mInstCode);
-                startActivity(NIntent);
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.choose_institution:
-                chooseInstitution();
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-
-        }
+        MainActivity.navigationSwitch(this,item, mIdList, mInstDetails, mDrawerLayout, mDomainName);
         return true;
     }
 
-    private void chooseInstitution() {
-        FirebaseUtils.FIRESTORE.collection(FirebaseUtils.USERS)
-                .document(FirebaseUtils.sFirebaseAuth.getUid()).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            DocumentSnapshot lSnapshot=task.getResult();
-                            User lUser=lSnapshot.toObject(User.class).withId(lSnapshot.getId());
-                            ArrayList<String> lInst=lUser.getInstitutions();
-                            Intent lIntent=new Intent(AddNotice.this,ChooseInstitution.class);
-                            lIntent.putExtra(IDLIST, mIdList);
-                            lIntent.putExtra(DNAME, mDomainName);
-                            lIntent.putExtra("InstitutionCode", mInstCode);
-                            lIntent.putExtra("institutionList",lInst);
-                            startActivity(lIntent);
-                            finish();
-                        }
 
-                    }
-                });
-
-    }
 }

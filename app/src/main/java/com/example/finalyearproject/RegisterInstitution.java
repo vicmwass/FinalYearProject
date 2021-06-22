@@ -10,6 +10,9 @@ import android.widget.EditText;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class RegisterInstitution extends AppCompatActivity {
 
     private EditText mEtInstName;
@@ -50,6 +53,7 @@ public class RegisterInstitution extends AppCompatActivity {
         }
         mInst.setName(lInstName);
         mInst.setCreator(mFirebaseAuth.getUid());
+        mInst.setAdminList(new ArrayList<String>(Arrays.asList(mFirebaseAuth.getUid())));
         generateCode(lInstName);
         FirebaseUtils.saveInstitution(this,mInst);
         mInstUser.setUserId(mFirebaseAuth.getUid());

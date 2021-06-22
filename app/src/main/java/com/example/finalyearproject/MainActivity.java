@@ -11,10 +11,11 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -28,14 +29,22 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+import static com.example.finalyearproject.LaunchActivity.INSTITUTION_CODE;
+import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
+
+ public class  MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
     public static final String IDLIST="idList";
     public static final String DNAME="domainN";
     public static final String NOTICE="notice";
-    public SharedViewModel mViewModel;
+
+    public static final String INSTITUTION_LIST = "institutionList";
+    public static final String SHARED_PREFS = "SharedPrefs";
+     public static final String CURRENT_ADMIN_LIST = "currentAdminList";
+     public SharedViewModel mViewModel;
     ArrayList<String> mIdList;
     ArrayList<String> mDomainNameList=new ArrayList<String>();
     private ViewPager mViewPager;
@@ -45,7 +54,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView mNavigationView;
     private DrawerLayout mDrawerLayout;
     private String mInstCode;
-    private Boolean finalExit=false;
+    private Boolean mFinalExit =false;
+    private Institution mInstDetails;
+    private Menu mOptionMenu;
 
 
     @Override
@@ -54,27 +65,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setContentView(R.layout.activity_main);
         Intent lIntent=getIntent();
-        mInstCode = lIntent.getStringExtra("InstitutionCode");
-
-
-
+        mInstDetails = (Institution) lIntent.getSerializableExtra(INSTITUTION_DETAILS);
+        mInstCode = mInstDetails.getCode();
         setupViewModel();
-
         setupNavigatioView();
-
-        setupViewPager();
-
+        setupAdapter();
 //        getSupportFragmentManager().beginTransaction()
 //                .add(R.id.domains_frame, new DomainListFragment())
 //                .add(R.id.notices_frame, new NoticeListFragment())
 //                .commit();
-
-
-
-
     }
 
-    private void setupViewPager() {
+     @Override
+     protected void onResume() {
+         super.onResume();
+         mNavigationView.setCheckedItem(R.id.nav_home);
+         mFinalExit =false;
+     }
+
+     private void setupAdapter() {
         mViewPager = findViewById(R.id.pager);
         mTabLayout = findViewById(R.id.tab_layout);
         mViewPageAdapter = new ViewPageAdapter(getSupportFragmentManager(),0);
@@ -96,10 +105,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        //to make navigation drawer clickable
+        //to lIntentmake navigation drawer clickable
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        mNavigationView.setCheckedItem(R.id.nav_home);
+
     }
 
     private void setupViewModel() {
@@ -117,13 +126,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mDomainNameList=domainNameList;
             }
         });
+        String userId=FirebaseUtils.sFirebaseAuth.getUid();
+        if(userId.equals(mInstDetails.getCreator())){
+            mViewModel.setDomainAdminList(new ArrayList<String>(Arrays.asList(mInstDetails.getCreator())));
+        }
+        if(userId.equals(mInstDetails.getCreator())|| mInstDetails.getAdminList().contains(FirebaseUtils.sFirebaseAuth.getUid())){
+            mViewModel.setAdminLevel("Main");
+        }
+
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater= getMenuInflater();
-        inflater.inflate(R.menu.domains,menu);
+        getMenuInflater().inflate(R.menu.main_activity_menu,menu);
+        mOptionMenu = menu;
+        return true;
+    }
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        mViewModel.getAdminLevel().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                if(s.equals("Main")||mIdList.contains(s)){
+                    menu.setGroupVisible(R.id.for_admin, true);
+                }else{
+                    menu.setGroupVisible(R.id.for_admin, false);
+                }
+            }
+        });
+
+
         return true;
     }
 
@@ -133,19 +166,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.to_new_domains:
                 Intent DIntent=new Intent(this, AddDomain.class);
                 DIntent.putExtra(IDLIST, mIdList);
-                DIntent.putExtra("InstitutionCode", mInstCode);
+                DIntent.putExtra(INSTITUTION_DETAILS, mInstDetails);
                 startActivity(DIntent);
                 break;
             case R.id.to_new_notice:
                 Intent NIntent =new Intent(this,AddNotice.class);
                 NIntent.putExtra(IDLIST, mIdList);
                 NIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
-                NIntent.putExtra("InstitutionCode", mInstCode);
+                NIntent.putExtra(INSTITUTION_DETAILS, mInstDetails);
                 startActivity(NIntent);
+                break;
+            case R.id.add_admin:
+                Intent AIntent =new Intent(this,AddAdmin.class);
+                AIntent.putExtra(IDLIST, mIdList);
+                AIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
+                AIntent.putExtra(CURRENT_ADMIN_LIST,mViewModel.getCurrentAdminList().getValue());
+                AIntent.putExtra(INSTITUTION_CODE, mInstCode);
+                startActivity(AIntent);
                 break;
             case R.id.sign_out:
                 FirebaseAuth.getInstance().signOut();
+                clearPrefData();
                 Intent OIntent=new Intent(this,LaunchActivity.class);
+                OIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(OIntent);
                 finish();
                 break;
@@ -161,16 +204,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int sz = mIdList.size();
 
         if(sz>0){
-            finalExit=false;
+            mFinalExit =false;
+            mViewModel.removePreviousAdmins();
             mIdList.remove(sz-1);
             mDomainNameList.remove(sz);
             mViewModel.setIdList(mIdList);
 
         }else{
-            if(finalExit){
+            if(mFinalExit){
+                savePrefData();
                 super.onBackPressed();
+                finishAffinity();
             }else {
-                finalExit=true;
+                mFinalExit =true;
                 Toast.makeText(this,"press again to exit",Toast.LENGTH_LONG).show();
             }
 
@@ -179,42 +225,63 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    private void savePrefData() {
+        SharedPreferences lSharedPreferences=getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+        SharedPreferences.Editor lEditor=lSharedPreferences.edit();
+        lEditor.putString(INSTITUTION_CODE,mInstCode);
+        lEditor.apply();
+    }
+    private void clearPrefData(){
+        SharedPreferences lSharedPreferences=getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+        SharedPreferences.Editor lEditor=lSharedPreferences.edit();
+        lEditor.remove(INSTITUTION_CODE).commit();
+
+
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.nav_home:
-                Intent lIntent=new Intent(this, MainActivity.class);
-                lIntent.putExtra(IDLIST, mIdList);
-                lIntent.putExtra("InstitutionCode", mInstCode);
-                startActivity(lIntent);
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.to_new_domains:
-                Intent DIntent=new Intent(this, AddDomain.class);
-                DIntent.putExtra(IDLIST, mIdList);
-                DIntent.putExtra("InstitutionCode", mInstCode);
-                DIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
-                startActivity(DIntent);
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.to_new_notice:
-                Intent NIntent =new Intent(this,AddNotice.class);
-                NIntent.putExtra(IDLIST, mIdList);
-                NIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
-                NIntent.putExtra("InstitutionCode", mInstCode);
-                startActivity(NIntent);
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.choose_institution:
-                chooseInstitution();
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-
-        }
+        navigationSwitch(this,item, mIdList, mInstDetails, mDrawerLayout,  mDomainNameList.get(mDomainNameList.size()-1));
         return true;
     }
 
-    private void chooseInstitution() {
+    public static void navigationSwitch(Activity activity, @NotNull MenuItem item, ArrayList<String> idList, Institution instDetails, DrawerLayout drawerLayout, String domainName) {
+        switch (item.getItemId()){
+            case R.id.nav_home:
+                Intent i = new Intent(activity, MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                activity.startActivity(i);
+//                Intent lIntent=new Intent(activity, MainActivity.class);
+//                lIntent.putExtra(IDLIST, idList);
+//                lIntent.putExtra(INSTITUTION_DETAILS, instDetails);
+//                activity.startActivity(lIntent);
+//                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.to_new_domains:
+                Intent DIntent=new Intent(activity, AddDomain.class);
+                DIntent.putExtra(IDLIST, idList);
+                DIntent.putExtra(INSTITUTION_DETAILS, instDetails);
+                DIntent.putExtra(DNAME, domainName);
+                activity.startActivity(DIntent);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.to_new_notice:
+                Intent NIntent =new Intent(activity,AddNotice.class);
+                NIntent.putExtra(IDLIST, idList);
+                NIntent.putExtra(DNAME, domainName);
+                NIntent.putExtra(INSTITUTION_DETAILS, instDetails);
+                activity.startActivity(NIntent);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.choose_institution:
+                chooseInstitution(activity, idList, instDetails, drawerLayout, domainName);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+
+        }
+    }
+
+    public static void chooseInstitution(Activity activity,ArrayList<String> idList, Institution instDetails, DrawerLayout drawerLayout, String domainName) {
         FirebaseUtils.FIRESTORE.collection(FirebaseUtils.USERS)
                 .document(FirebaseUtils.sFirebaseAuth.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -224,12 +291,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             DocumentSnapshot lSnapshot=task.getResult();
                             User lUser=lSnapshot.toObject(User.class).withId(lSnapshot.getId());
                             ArrayList<String> lInst=lUser.getInstitutions();
-                            Intent lIntent=new Intent(MainActivity.this,ChooseInstitution.class);
-                            lIntent.putExtra(IDLIST, mIdList);
-                            lIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
-                            lIntent.putExtra("InstitutionCode", mInstCode);
-                            lIntent.putExtra("institutionList",lInst);
-                            startActivity(lIntent);
+                            Intent lIntent=new Intent(activity,ChooseInstitution.class);
+                            lIntent.putExtra(IDLIST, idList);
+                            lIntent.putExtra(DNAME, domainName);
+                            lIntent.putExtra(INSTITUTION_DETAILS, instDetails);
+                            lIntent.putExtra(INSTITUTION_LIST,lInst);
+                            activity.startActivity(lIntent);
 
                         }
 

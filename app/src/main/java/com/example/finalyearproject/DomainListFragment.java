@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 public class DomainListFragment extends Fragment {
@@ -36,21 +38,29 @@ public class DomainListFragment extends Fragment {
     public void onViewCreated(@NonNull  View view, @Nullable  Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
-        mDomainRecyclerView = view.findViewById(R.id.domain_recycler_view);
-        mDomainsAdapter = new DomainsAdapter(mViewModel);
-        mDomainRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        mDomainRecyclerView.setAdapter(mDomainsAdapter);
+        setupAdapter(view);
+        setupSwipeRefresh(view);
+
+    }
+
+    public void setupSwipeRefresh(@NotNull View view) {
         mSwipeRefreshLayout = view.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mDomainsAdapter.populataData(mIdList);
+                mDomainsAdapter.populateData(mIdList);
                 mDomainsAdapter.notifyDataSetChanged();
                 mSwipeRefreshLayout.setRefreshing(false);
 
             }
         });
+    }
 
+    public void setupAdapter(@NotNull View view) {
+        mDomainRecyclerView = view.findViewById(R.id.domain_recycler_view);
+        mDomainsAdapter = new DomainsAdapter(mViewModel);
+        mDomainRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        mDomainRecyclerView.setAdapter(mDomainsAdapter);
     }
 
     @Override
@@ -60,7 +70,7 @@ public class DomainListFragment extends Fragment {
             @Override
             public void onChanged(@Nullable ArrayList<String> idList) {
                 mIdList=idList;
-                mDomainsAdapter.populataData(idList);
+                mDomainsAdapter.populateData(idList);
                 mDomainsAdapter.notifyDataSetChanged();
             }
         });

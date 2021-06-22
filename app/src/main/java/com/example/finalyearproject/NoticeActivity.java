@@ -25,16 +25,12 @@ public class NoticeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notice);
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
-        mTvSender = findViewById(R.id.tv_display_sender);
-        mTvSubject = findViewById(R.id.tv_display_subject);
-        mTvDescription = findViewById(R.id.tv_display_description);
-        mTvFile = findViewById(R.id.tv_display_file);
-        mTvFileAttach = findViewById(R.id.tv_file_attach);
-        mLlOpenFile = findViewById(R.id.open_file);
+        initializeViews();
+        loadData();
 
+    }
+
+    private void loadData() {
         Intent lIntent=getIntent();
         Notice lNotice= (Notice) lIntent.getSerializableExtra(MainActivity.NOTICE);
         mTvSender.setText(lNotice.getSender());
@@ -54,6 +50,17 @@ public class NoticeActivity extends AppCompatActivity {
                 }
             });
         }
+    }
 
+    private void initializeViews() {
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
+        mTvSender = findViewById(R.id.tv_display_sender);
+        mTvSubject = findViewById(R.id.tv_display_subject);
+        mTvDescription = findViewById(R.id.tv_display_description);
+        mTvFile = findViewById(R.id.tv_display_file);
+        mTvFileAttach = findViewById(R.id.tv_file_attach);
+        mLlOpenFile = findViewById(R.id.open_file);
     }
 }

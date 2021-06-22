@@ -6,4 +6,5 @@
     <dimen name="margin_start">5dp</dimen>
     <dimen name="edit_text_margin">16dp</dimen>
     <dimen name="multiline_et_height">95dp</dimen>
+    <dimen name="padding_layout">20dp</dimen>
 </resources>

@@ -20,30 +20,35 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
+import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
+
 public class InstitutionAdapter extends RecyclerView.Adapter<InstitutionAdapter.InstitutionViewHolder>{
     ArrayList<String> mInstList;
     Activity mActivity;
     ArrayList<String> mInstNameList;
+
     public InstitutionAdapter(Activity activity, ArrayList<String> instList, ArrayList<String> instNameList) {
         this.mInstList =instList;
         this.mActivity =activity;
         this.mInstNameList=instNameList;
-//        getInstNames();
+
     }
 
-    private void getInstNames() {
-        for (String code:mInstList){
+    private void getInstDetails(String code) {
             FirebaseUtils.FIRESTORE.collection(FirebaseUtils.INSTITUTIONS).document(code)
                     .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                     if(task.isSuccessful()){
-                        String lName=task.getResult().toObject(Institution.class).getName();
-                        mInstNameList.add(lName);
+                        Institution selectedInst=task.getResult().toObject(Institution.class);
+                        Intent lIntent=new Intent(mActivity,MainActivity.class);
+                        lIntent.putExtra(INSTITUTION_DETAILS, selectedInst);
+                        lIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        mActivity.startActivity(lIntent);
+                        mActivity.finish();
                     }
                 }
             });
-        }
     }
 
 
@@ -64,11 +69,7 @@ public class InstitutionAdapter extends RecyclerView.Adapter<InstitutionAdapter.
         holder.mRCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent lIntent=new Intent(mActivity,MainActivity.class);
-                lIntent.putExtra("InstitutionCode", lInstCode);
-                mActivity.startActivity(lIntent);
-                mActivity.finish();
-
+                getInstDetails(lInstCode);
             }
         });
 

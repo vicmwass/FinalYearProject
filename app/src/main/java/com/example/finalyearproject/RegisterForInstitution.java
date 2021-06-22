@@ -1,5 +1,6 @@
 package com.example.finalyearproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -7,8 +8,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import org.jetbrains.annotations.NotNull;
 
 public class RegisterForInstitution extends AppCompatActivity {
 
@@ -34,9 +41,7 @@ public class RegisterForInstitution extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(saveDetails()){
-                    Intent lIntent=new Intent(RegisterForInstitution.this,MainActivity.class);
-                    lIntent.putExtra("InstitutionCode", mInstCode);
-                    startActivity(lIntent);
+                    checkInstitutionExists();
                 }
             }
         });
@@ -46,17 +51,37 @@ public class RegisterForInstitution extends AppCompatActivity {
     private Boolean saveDetails() {
         mInstCode = mEtInstCode.getText().toString().trim();
         if(mInstCode.length()<0){
-            mEtInstCode.setError("Name is Required");
+            mEtInstCode.setError("Code is Required");
             mEtInstCode.requestFocus();
             return false;
         }
-        mInstUser.setUserId(mFirebaseAuth.getUid());
-        mInstUser.setEmail(mFirebaseAuth.getCurrentUser().getEmail());
-        mUser.setId(mFirebaseAuth.getUid());
-        mUser.addInstitution(mInstCode);
-        FirebaseUtils.saveInstUserDetails(mInstCode,mInstUser);
-        FirebaseUtils.saveUserDetails(mUser);
+
         return true;
+    }
+
+    private void checkInstitutionExists() {
+        FirebaseUtils.FIRESTORE.collection(FirebaseUtils.INSTITUTIONS).document(mInstCode)
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                    if(task.getResult().exists()){
+                        mInstUser.setUserId(mFirebaseAuth.getUid());
+                        mInstUser.setEmail(mFirebaseAuth.getCurrentUser().getEmail());
+                        mUser.setId(mFirebaseAuth.getUid());
+                        mUser.addInstitution(mInstCode);
+                        FirebaseUtils.saveInstUserDetails(mInstCode,mInstUser);
+                        FirebaseUtils.saveUserDetails(mUser);
+                        Intent lIntent=new Intent(RegisterForInstitution.this,MainActivity.class);
+                        lIntent.putExtra("InstitutionCode", mInstCode);
+                        startActivity(lIntent);
+                    }else {
+                        Toast.makeText(RegisterForInstitution.this,"Institution code does not exit",Toast.LENGTH_LONG).show();
+                        return ;
+                    }
+
+                }
+
+        });
     }
 
 

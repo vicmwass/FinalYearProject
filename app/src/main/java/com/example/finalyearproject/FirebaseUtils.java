@@ -58,7 +58,6 @@ public class FirebaseUtils {
     public static final FirebaseFirestore FIRESTORE = FirebaseFirestore.getInstance();
     private static Activity sSignInCaller;
     public static FirebaseAuth.AuthStateListener sAuthStateListener;
-    public static final int RC_SIGN_IN = 3397;
     public static StorageReference sStorageReference;
     public static FirebaseStorage sFirebaseStorage;
 
@@ -70,9 +69,9 @@ public class FirebaseUtils {
             sFirebaseUtils = new FirebaseUtils();
             sFirebaseAuth = FirebaseAuth.getInstance();
             sSignInCaller = callerActivity;
-            if (sFirebaseAuth.getCurrentUser() == null) {
-                FirebaseUtils.signIn();
-            }
+//            if (sFirebaseAuth.getCurrentUser() == null) {
+//                FirebaseUtils.signIn();
+//            }
 //            sAuthStateListener = new FirebaseAuth.AuthStateListener() {
 //                @Override
 //                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -95,21 +94,27 @@ public class FirebaseUtils {
         sFirebaseAuth.removeAuthStateListener(sAuthStateListener);
     }
 
-    public static void signIn() {
+    public static void signIn(int signInType) {
         // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build()
-//                ,
-//                new AuthUI.IdpConfig.GoogleBuilder().build()
+                ,
+                new AuthUI.IdpConfig.GoogleBuilder().build()
         );
+
+
 
 // Create and launch sign-in intent
         sSignInCaller.startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
+                        .setIsSmartLockEnabled(false)
                         .setAvailableProviders(providers)
                         .build(),
-                RC_SIGN_IN);
+                signInType);
+    }
+    public static void signOut(){
+        sFirebaseAuth.signOut();
     }
 
     private static void addUserInst(User user){
@@ -117,6 +122,56 @@ public class FirebaseUtils {
             FIRESTORE.collection(USERS)
                     .document(user.getId())
                     .update(INSTITUTIONS1FIELD, FieldValue.arrayUnion(inst));
+        }
+
+    }
+
+    public static void addDomainAdmin(Context context,String instCode,ArrayList<String> idList,ArrayList<String> adminList){
+        DocumentReference tempDocRef= FIRESTORE.collection(INSTITUTIONS).document(instCode);
+        if(idList.size()>0){
+            CollectionReference tempRef= tempDocRef.collection("domains");
+            String domainId=idList.remove(idList.size()-1);
+            for(String Id:idList){
+                tempRef =tempRef.document(Id).collection("domains");
+            }
+            for(String adminId:adminList){
+                tempRef.document(domainId)
+                        .update("adminList", FieldValue.arrayUnion(adminId))
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(context,"Added successful",Toast.LENGTH_LONG).show();
+//                        Log.d("Firestore", "Document updated with ID: " + PatientPostRef.getId());
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(context,"Failed to add",Toast.LENGTH_LONG).show();
+//                        Log.e("Firestore", "Error updating document", e);
+                            }
+                        });
+            }
+
+        }else{
+            for(String adminId:adminList){
+            tempDocRef.update("adminList", FieldValue.arrayUnion(adminId))
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(context,"Added successful",Toast.LENGTH_LONG).show();
+//                        Log.d("Firestore", "Document updated with ID: " + PatientPostRef.getId());
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(context,"Failed to add",Toast.LENGTH_LONG).show();
+//                        Log.e("Firestore", "Error updating document", e);
+                        }
+                    });
+            }
+
         }
 
     }

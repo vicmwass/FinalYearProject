@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
@@ -14,17 +13,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
+import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
 import static com.example.finalyearproject.MainActivity.DNAME;
-import static com.example.finalyearproject.MainActivity.IDLIST;
+
 
 public class AddDomain extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -37,28 +34,42 @@ public class AddDomain extends AppCompatActivity implements NavigationView.OnNav
     private NavigationView mNavigationView;
     private DrawerLayout mDrawerLayout;
     private String mDomainName;
+    private Institution mInstDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_domain);
-        mEtDomainName1 = findViewById(R.id.et_domain_name);
+        initializeViews();
+
         Intent lIntent=getIntent();
         mIdList = lIntent.getStringArrayListExtra(MainActivity.IDLIST);
-        mInstCode = lIntent.getStringExtra("InstitutionCode");
+        mInstDetails = (Institution) lIntent.getSerializableExtra(INSTITUTION_DETAILS);
+        mInstCode = mInstDetails.getCode();
         mDomainName=lIntent.getStringExtra(DNAME);
         setupNavigatioView();
         mDomain = new Domain();
 
     }
 
-    private void setupNavigatioView() {
+    private void initializeViews() {
+        mEtDomainName1 = findViewById(R.id.et_domain_name);
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(R.string.app_name);
 
         mDrawerLayout =findViewById(R.id.drawer_layout);
         mNavigationView =findViewById(R.id.nav_view);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mNavigationView.setCheckedItem(R.id.to_new_domains);
+    }
+
+    private void setupNavigatioView() {
+
 
 
         mNavigationView.bringToFront();//when navdrawer items clicked show that color to represent click
@@ -69,7 +80,7 @@ public class AddDomain extends AppCompatActivity implements NavigationView.OnNav
         //to make navigation drawer clickable
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        mNavigationView.setCheckedItem(R.id.to_new_domains);
+
     }
 
     @Override
@@ -104,59 +115,9 @@ public class AddDomain extends AppCompatActivity implements NavigationView.OnNav
     }
 
     public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.nav_home:
-                Intent Intent=new Intent(this, MainActivity.class);
-                Intent.putExtra(IDLIST, mIdList);
-                Intent.putExtra("InstitutionCode", mInstCode);
-                startActivity(Intent);
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.to_new_domains:
-                Intent DIntent=new Intent(this, AddDomain.class);
-                DIntent.putExtra(IDLIST, mIdList);
-                DIntent.putExtra("InstitutionCode", mInstCode);
-                startActivity(DIntent);
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.to_new_notice:
-                Intent NIntent =new Intent(this,AddNotice.class);
-                NIntent.putExtra(IDLIST, mIdList);
-                NIntent.putExtra(DNAME, mDomainName);
-                NIntent.putExtra("InstitutionCode", mInstCode);
-                startActivity(NIntent);
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.choose_institution:
-                chooseInstitution();
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                break;
-
-        }
+        MainActivity.navigationSwitch(this,item, mIdList, mInstDetails, mDrawerLayout, mDomainName);
         return true;
     }
 
-    private void chooseInstitution() {
-        FirebaseUtils.FIRESTORE.collection(FirebaseUtils.USERS)
-                .document(FirebaseUtils.sFirebaseAuth.getUid()).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            DocumentSnapshot lSnapshot=task.getResult();
-                            User lUser=lSnapshot.toObject(User.class).withId(lSnapshot.getId());
-                            ArrayList<String> lInst=lUser.getInstitutions();
-                            Intent lIntent=new Intent(AddDomain.this,ChooseInstitution.class);
-                            lIntent.putExtra(IDLIST, mIdList);
-                            lIntent.putExtra(DNAME, mDomainName);
-                            lIntent.putExtra("InstitutionCode", mInstCode);
-                            lIntent.putExtra("institutionList",lInst);
-                            startActivity(lIntent);
-                            finish();
-                        }
 
-                    }
-                });
-
-    }
 }

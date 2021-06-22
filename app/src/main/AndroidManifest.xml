@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalYearProject">
-        <activity android:name=".ChooseInstitution"></activity>
+        <activity android:name=".AddAdmin"></activity>
+        <activity android:name=".ChooseInstitution" />
         <activity android:name=".RegisterForInstitution" />
         <activity android:name=".RegisterInstitution" />
         <activity android:name=".LaunchActivity">
@@ -35,7 +36,7 @@
 
         <activity android:name=".AddNotice" />
         <activity android:name=".AddDomain" />
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

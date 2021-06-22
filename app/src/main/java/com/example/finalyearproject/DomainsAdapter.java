@@ -72,7 +72,7 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
     public void setDomainNameList(ArrayList<String> domainNameList){
         this.mDomainNameList=domainNameList;
     }
-    public void populataData(ArrayList<String> idList){
+    public void populateData(ArrayList<String> idList){
         this.mIdList=idList;
         populateArray();
         notifyDataSetChanged();
@@ -88,6 +88,7 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
     @Override
     public void onBindViewHolder(@NonNull DomainsViewHolder holder, int position) {
         Domain lDomain = mDomainList.get(position);
+        String userId = FirebaseUtils.sFirebaseAuth.getUid();
         holder.tvDName.setText(lDomain.getName());
         holder.rlCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,7 +97,10 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
                 mDomainNameList.add(lDomain.getName());
                 mViewModel.setIdList(mIdList);
                 mViewModel.setDomainNameList(mDomainNameList);
-
+                mViewModel.setDomainAdminList(lDomain.getAdminList());
+                if(lDomain.getAdminList().contains(userId)){
+                    mViewModel.setAdminLevel(lDomain.getId());
+                }
             }
         });
 
