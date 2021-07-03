@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.HelperClasses;
 
 import android.Manifest;
 import android.app.Activity;
@@ -11,11 +11,15 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import com.example.finalyearproject.Modules.Domain;
+import com.example.finalyearproject.Modules.InstUser;
+import com.example.finalyearproject.Modules.Institution;
+import com.example.finalyearproject.Modules.Notice;
+import com.example.finalyearproject.Modules.User;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,10 +31,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
@@ -216,7 +218,7 @@ public class FirebaseUtils {
                     });
     }
 
-    public static void saveInstUserDetails(String Code,InstUser user){
+    public static void saveInstUserDetails(String Code, InstUser user){
         FIRESTORE.collection(INSTITUTIONS).document(Code).collection(INSTUSERS)
                 .document(user.getUserId())
                 .set(user)
@@ -252,7 +254,7 @@ public class FirebaseUtils {
     }
 
 
-    public static void saveInstitution(Context context,Institution institution){
+    public static void saveInstitution(Context context, Institution institution){
         final DocumentReference institutionRef= FIRESTORE.collection(INSTITUTIONS).document(institution.getCode());
         institutionRef.set(institution)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -274,7 +276,7 @@ public class FirebaseUtils {
     }
 
 
-    public static void saveDomain(String instCode,Domain domain, Context context,ArrayList<String> idList){
+    public static void saveDomain(String instCode, Domain domain, Context context, ArrayList<String> idList){
         CollectionReference tempRef= FIRESTORE.collection(INSTITUTIONS).document(instCode).collection("domains");
         final DocumentReference domainsRef;
         if(idList.size()>0){
@@ -317,7 +319,7 @@ public class FirebaseUtils {
         });
     }
 
-    public static void saveNotice(String instCode,Activity activity,Notice notice,String Id){
+    public static void saveNotice(String instCode, Activity activity, Notice notice, String Id){
         final DocumentReference noticeRef;
             noticeRef= FIRESTORE.collection(INSTITUTIONS).document(instCode).collection("notices")
                     .document(Id)

@@ -1,6 +1,5 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.AddDomain;
 
-import android.app.Activity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +12,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.finalyearproject.Activities.AddAdmin.AddAdminViewModel;
+import com.example.finalyearproject.Activities.AddAdmin.AdminAdapter;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.InstUser;
+import com.example.finalyearproject.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -25,22 +28,24 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHolder> {
+public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MembersViewHolder> {
     ArrayList<InstUser> mInstUserList=new ArrayList<InstUser>();
-//    Activity mActivity;
+    //    Activity mActivity;
 //    ArrayList<String> mInstNameList;
-    AddAdminViewModel mViewModel;
+    AddDomainViewModel mViewModel;
 
     String mInstCode;
+    private HashSet<String> mMembersOfPrivateDomain;
 
-    public AdminAdapter(String instCode,AddAdminViewModel viewModel) {
-        this.mInstCode=instCode;
-        this.mViewModel=viewModel;
+    public MembersAdapter( String instCode,AddDomainViewModel viewModel) {
+        mViewModel = viewModel;
+        mInstCode = instCode;
+        mMembersOfPrivateDomain = mViewModel.getMembersOfPrivateDomain().getValue();
         populateData();
     }
 
     private void populateData() {
-            CollectionReference tempRef = FirebaseUtils.FIRESTORE.collection("Institutions").document(mInstCode).collection("Users");
+        CollectionReference tempRef = FirebaseUtils.FIRESTORE.collection("Institutions").document(mInstCode).collection("Users");
 
 
         tempRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -51,18 +56,14 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
                     return;
                 }
                 if(value.getDocumentChanges().size()>0) {
-                    HashSet<String> currentAdmins=mViewModel.getCurrentAdminNameSet().getValue();
-
                     for (DocumentChange dc : value.getDocumentChanges()) {
                         switch (dc.getType()) {
                             case ADDED:
                                 String id = dc.getDocument().getId();
                                 InstUser lInstUser = dc.getDocument().toObject(InstUser.class);
-                                if(!currentAdmins.contains(lInstUser.getUserId())){
-                                    mInstUserList.add(lInstUser);
-                                }
+                                mInstUserList.add(lInstUser);
                                 Log.d("DomainName", lInstUser.getEmail());
-                                AdminAdapter.this.notifyDataSetChanged();
+                                MembersAdapter.this.notifyDataSetChanged();
                                 break;
                             case MODIFIED:
                                 break;
@@ -73,19 +74,19 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
                 }
             }
         });
-
     }
 
     @NonNull
+    @NotNull
     @Override
-    public AdminViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View lView = LayoutInflater.from(parent.getContext()).inflate(R.layout.admin_users_card,parent,false);
-        AdminViewHolder lAdminViewHolder=new AdminViewHolder(lView);
-        return lAdminViewHolder;
+    public MembersViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        View lView= LayoutInflater.from(parent.getContext()).inflate(R.layout.admin_users_card,parent,false);
+        MembersViewHolder lViewHolder=new MembersViewHolder(lView);
+        return lViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull AdminAdapter.AdminViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull MembersAdapter.MembersViewHolder holder, int position) {
         InstUser lInstUser =mInstUserList.get(position);
         holder.mTvName.setText(lInstUser.getEmail());
         holder.mRCard.setOnClickListener(new View.OnClickListener() {
@@ -93,10 +94,10 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
             public void onClick(View v) {
                 if(holder.mCbUser.isChecked()){
                     holder.mCbUser.setChecked(false);
-                    mViewModel.removeAdminFromSet(lInstUser.getUserId());
+                    mViewModel.removeMemberFromSet(lInstUser.getUserId());
                 }else{
                     holder.mCbUser.setChecked(true);
-                    mViewModel.addAdminToSet(lInstUser.getUserId());
+                    mViewModel.addMemberToSet(lInstUser.getUserId());
 
                 }
             }
@@ -104,20 +105,17 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
         holder.mCbUser.setClickable(false);
     }
 
-
-
     @Override
     public int getItemCount() {
         return mInstUserList.size();
     }
 
-    public class AdminViewHolder extends RecyclerView.ViewHolder{
-
+    public class MembersViewHolder extends RecyclerView.ViewHolder{
         private final RelativeLayout mRCard;
         private final TextView mTvName;
         private final CheckBox mCbUser;
 
-        public AdminViewHolder(@NonNull @NotNull View itemView) {
+        public MembersViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
             mRCard = itemView.findViewById(R.id.admin_card);
             mTvName = itemView.findViewById(R.id.tv_user_name);

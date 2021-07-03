@@ -1,7 +1,6 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.ChooseIntitution;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.finalyearproject.Activities.Main.MainActivity;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.Institution;
+import com.example.finalyearproject.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -20,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
+import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
 
 public class InstitutionAdapter extends RecyclerView.Adapter<InstitutionAdapter.InstitutionViewHolder>{
     ArrayList<String> mInstList;
@@ -41,7 +44,7 @@ public class InstitutionAdapter extends RecyclerView.Adapter<InstitutionAdapter.
                 public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                     if(task.isSuccessful()){
                         Institution selectedInst=task.getResult().toObject(Institution.class);
-                        Intent lIntent=new Intent(mActivity,MainActivity.class);
+                        Intent lIntent=new Intent(mActivity, MainActivity.class);
                         lIntent.putExtra(INSTITUTION_DETAILS, selectedInst);
                         lIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         mActivity.startActivity(lIntent);

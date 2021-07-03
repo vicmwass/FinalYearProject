@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.Launch;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,12 +8,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.finalyearproject.Activities.Main.MainActivity;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.InstUser;
+import com.example.finalyearproject.Modules.Institution;
+import com.example.finalyearproject.Modules.User;
+import com.example.finalyearproject.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class RegisterInstitution extends AppCompatActivity {
+public class RegisterInstitutionActivity extends AppCompatActivity {
 
     private EditText mEtInstName;
     private Institution mInst;
@@ -35,7 +41,7 @@ public class RegisterInstitution extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(saveDetails()){
-                    Intent lIntent=new Intent(RegisterInstitution.this,MainActivity.class);
+                    Intent lIntent=new Intent(RegisterInstitutionActivity.this, MainActivity.class);
                     lIntent.putExtra("InstitutionCode", mInst.getCode());
                     startActivity(lIntent);
                 }

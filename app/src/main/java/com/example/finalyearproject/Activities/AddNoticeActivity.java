@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +25,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.finalyearproject.Activities.Main.MainActivity;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.Institution;
+import com.example.finalyearproject.Modules.Notice;
+import com.example.finalyearproject.R;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -38,11 +43,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
-import static com.example.finalyearproject.MainActivity.DNAME;
-import static com.example.finalyearproject.MainActivity.IDLIST;
+import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
+import static com.example.finalyearproject.Activities.Main.MainActivity.DNAME;
+import static com.example.finalyearproject.Activities.Main.MainActivity.IDLIST;
 
-public class AddNotice extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class AddNoticeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private EditText mEtSender;
     private EditText mEtSubject;

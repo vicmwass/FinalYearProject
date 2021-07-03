@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.Main.SubDomains;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.finalyearproject.Activities.Main.SharedViewModel;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.Domain;
+import com.example.finalyearproject.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -18,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsViewHolder> {
     ArrayList<Domain> mDomainList=new ArrayList<Domain>();
@@ -54,7 +59,15 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
                             case ADDED:
                                 String id = dc.getDocument().getId();
                                 Domain domain = dc.getDocument().toObject(Domain.class).withId(id);
-                                mDomainList.add(domain);
+                                if(domain.getPrivate()){
+                                    HashSet<String> memberSet=new HashSet<>(domain.getMemberList());
+                                    if(memberSet.contains(FirebaseUtils.sFirebaseAuth.getUid())){
+                                        mDomainList.add(domain);
+                                    }
+                                }else {
+                                    mDomainList.add(domain);
+                                }
+
                                 Log.d("DomainName", domain.getName());
                                 DomainsAdapter.this.notifyDataSetChanged();
                                 break;
@@ -94,13 +107,30 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
             @Override
             public void onClick(View v) {
                 mIdList.add(lDomain.getId());
-                mDomainNameList.add(lDomain.getName());
                 mViewModel.setIdList(mIdList);
+                mDomainNameList.add(lDomain.getName());
                 mViewModel.setDomainNameList(mDomainNameList);
-                mViewModel.setDomainAdminList(lDomain.getAdminList());
-                if(lDomain.getAdminList().contains(userId)){
-                    mViewModel.setAdminLevel(lDomain.getId());
+                if (!lDomain.getPrivate()){
+                    mViewModel.setDomainAdminList(lDomain.getAdminList());
+                    if(mViewModel.getPrivacyLevel().getValue()>0){
+                        mViewModel.incrementPrivacyLevel();
+                        if (lDomain.getAdminList().contains(userId)) {
+                            mViewModel.setPrivateDomainAdminLevel(lDomain.getId());
+                        }
+                    }else{
+                        if (lDomain.getAdminList().contains(userId)) {
+                            mViewModel.setAdminLevel(lDomain.getId());
+                        }
+                    }
+            }else{
+                    mViewModel.incrementPrivacyLevel();
+                    mViewModel.setDomainAdminList(lDomain.getAdminList());
+                    mViewModel.setPrivateMemberList(lDomain.getMemberList());
+                    if (lDomain.getAdminList().contains(userId)) {
+                        mViewModel.setPrivateDomainAdminLevel(lDomain.getId());
+                    }
                 }
+
             }
         });
 

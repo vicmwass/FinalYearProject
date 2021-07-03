@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.Launch;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +10,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.finalyearproject.Activities.Main.MainActivity;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.InstUser;
+import com.example.finalyearproject.Modules.User;
+import com.example.finalyearproject.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,7 +22,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
-public class RegisterForInstitution extends AppCompatActivity {
+public class RegisterForInstitutionActivity extends AppCompatActivity {
 
     private EditText mEtInstCode;
     private User mUser;
@@ -71,11 +76,11 @@ public class RegisterForInstitution extends AppCompatActivity {
                         mUser.addInstitution(mInstCode);
                         FirebaseUtils.saveInstUserDetails(mInstCode,mInstUser);
                         FirebaseUtils.saveUserDetails(mUser);
-                        Intent lIntent=new Intent(RegisterForInstitution.this,MainActivity.class);
+                        Intent lIntent=new Intent(RegisterForInstitutionActivity.this, MainActivity.class);
                         lIntent.putExtra("InstitutionCode", mInstCode);
                         startActivity(lIntent);
                     }else {
-                        Toast.makeText(RegisterForInstitution.this,"Institution code does not exit",Toast.LENGTH_LONG).show();
+                        Toast.makeText(RegisterForInstitutionActivity.this,"Institution code does not exit",Toast.LENGTH_LONG).show();
                         return ;
                     }
 

@@ -1,4 +1,4 @@
- package com.example.finalyearproject;
+ package com.example.finalyearproject.Activities.Main;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +19,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.finalyearproject.Activities.AddAdmin.AddAdminActivity;
+import com.example.finalyearproject.Activities.AddDomain.AddDomainActivity;
+import com.example.finalyearproject.Activities.AddNoticeActivity;
+import com.example.finalyearproject.Activities.Launch.LaunchActivity;
+import com.example.finalyearproject.Activities.ChooseIntitution.ChooseInstitutionActivity;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.Institution;
+import com.example.finalyearproject.Modules.User;
+import com.example.finalyearproject.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
@@ -31,8 +40,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.example.finalyearproject.LaunchActivity.INSTITUTION_CODE;
-import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
+import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_CODE;
+import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
 
  public class  MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -126,7 +135,7 @@ import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
                 mDomainNameList=domainNameList;
             }
         });
-        String userId=FirebaseUtils.sFirebaseAuth.getUid();
+        String userId= FirebaseUtils.sFirebaseAuth.getUid();
         if(userId.equals(mInstDetails.getCreator())){
             mViewModel.setDomainAdminList(new ArrayList<String>(Arrays.asList(mInstDetails.getCreator())));
         }
@@ -145,16 +154,31 @@ import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
     }
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        mViewModel.getAdminLevel().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                if(s.equals("Main")||mIdList.contains(s)){
-                    menu.setGroupVisible(R.id.for_admin, true);
-                }else{
-                    menu.setGroupVisible(R.id.for_admin, false);
+        if(mViewModel.getPrivacyLevel().getValue()>0){
+            mViewModel.getPrivateDomainAdminLevel().observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(String s) {
+                    if(mIdList.contains(s)){
+                        menu.setGroupVisible(R.id.for_admin, true);
+                    }else {
+                        menu.setGroupVisible(R.id.for_admin, false);
+                    }
+
                 }
-            }
-        });
+            });
+        }else{
+            mViewModel.getAdminLevel().observe(this, new Observer<String>() {
+                @Override
+                public void onChanged(String s) {
+                    if(s.equals("Main")||mIdList.contains(s)){
+                        menu.setGroupVisible(R.id.for_admin, true);
+                    }else{
+                        menu.setGroupVisible(R.id.for_admin, false);
+                    }
+                }
+            });
+        }
+
 
 
         return true;
@@ -164,30 +188,37 @@ import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.to_new_domains:
-                Intent DIntent=new Intent(this, AddDomain.class);
+                Intent DIntent=new Intent(this, AddDomainActivity.class);
                 DIntent.putExtra(IDLIST, mIdList);
                 DIntent.putExtra(INSTITUTION_DETAILS, mInstDetails);
+                if(mViewModel.getPrivacyLevel().getValue()>0){
+                    DIntent.putExtra(CURRENT_ADMIN_LIST,mViewModel.getPrivateCurrentAdminList().getValue());
+                    DIntent.putExtra("members",mViewModel.getPrivateMemberList().getValue());
+                }else DIntent.putExtra(CURRENT_ADMIN_LIST,mViewModel.getCurrentAdminList().getValue());
                 startActivity(DIntent);
                 break;
             case R.id.to_new_notice:
-                Intent NIntent =new Intent(this,AddNotice.class);
+                Intent NIntent =new Intent(this, AddNoticeActivity.class);
                 NIntent.putExtra(IDLIST, mIdList);
                 NIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
                 NIntent.putExtra(INSTITUTION_DETAILS, mInstDetails);
                 startActivity(NIntent);
                 break;
             case R.id.add_admin:
-                Intent AIntent =new Intent(this,AddAdmin.class);
+                Intent AIntent =new Intent(this, AddAdminActivity.class);
                 AIntent.putExtra(IDLIST, mIdList);
                 AIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
-                AIntent.putExtra(CURRENT_ADMIN_LIST,mViewModel.getCurrentAdminList().getValue());
+                if(mViewModel.getPrivacyLevel().getValue()>0){
+                    AIntent.putExtra(CURRENT_ADMIN_LIST,mViewModel.getPrivateCurrentAdminList().getValue());
+                    AIntent.putExtra("members",mViewModel.getPrivateMemberList().getValue());
+                }else AIntent.putExtra(CURRENT_ADMIN_LIST,mViewModel.getCurrentAdminList().getValue());
                 AIntent.putExtra(INSTITUTION_CODE, mInstCode);
                 startActivity(AIntent);
                 break;
             case R.id.sign_out:
                 FirebaseAuth.getInstance().signOut();
                 clearPrefData();
-                Intent OIntent=new Intent(this,LaunchActivity.class);
+                Intent OIntent=new Intent(this, LaunchActivity.class);
                 OIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(OIntent);
                 finish();
@@ -204,6 +235,7 @@ import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
         int sz = mIdList.size();
 
         if(sz>0){
+            if(mViewModel.getPrivacyLevel().getValue()>0)mViewModel.decrementPrivacyLevel();
             mFinalExit =false;
             mViewModel.removePreviousAdmins();
             mIdList.remove(sz-1);
@@ -258,7 +290,7 @@ import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
 //                drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.to_new_domains:
-                Intent DIntent=new Intent(activity, AddDomain.class);
+                Intent DIntent=new Intent(activity, AddDomainActivity.class);
                 DIntent.putExtra(IDLIST, idList);
                 DIntent.putExtra(INSTITUTION_DETAILS, instDetails);
                 DIntent.putExtra(DNAME, domainName);
@@ -266,7 +298,7 @@ import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.to_new_notice:
-                Intent NIntent =new Intent(activity,AddNotice.class);
+                Intent NIntent =new Intent(activity, AddNoticeActivity.class);
                 NIntent.putExtra(IDLIST, idList);
                 NIntent.putExtra(DNAME, domainName);
                 NIntent.putExtra(INSTITUTION_DETAILS, instDetails);
@@ -291,7 +323,7 @@ import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
                             DocumentSnapshot lSnapshot=task.getResult();
                             User lUser=lSnapshot.toObject(User.class).withId(lSnapshot.getId());
                             ArrayList<String> lInst=lUser.getInstitutions();
-                            Intent lIntent=new Intent(activity,ChooseInstitution.class);
+                            Intent lIntent=new Intent(activity, ChooseInstitutionActivity.class);
                             lIntent.putExtra(IDLIST, idList);
                             lIntent.putExtra(DNAME, domainName);
                             lIntent.putExtra(INSTITUTION_DETAILS, instDetails);

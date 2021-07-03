@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -10,7 +10,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class NoticeActivity extends AppCompatActivity {
+import com.example.finalyearproject.Activities.Main.MainActivity;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.Notice;
+import com.example.finalyearproject.R;
+
+public class OpenNoticeActivity extends AppCompatActivity {
 
 
     private TextView mTvSender;
@@ -45,8 +50,8 @@ public class NoticeActivity extends AppCompatActivity {
             mLlOpenFile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final ProgressDialog progressDialog = new ProgressDialog(NoticeActivity.this);
-                    FirebaseUtils.saveFileLocally(NoticeActivity.this,lNotice,progressDialog);
+                    final ProgressDialog progressDialog = new ProgressDialog(OpenNoticeActivity.this);
+                    FirebaseUtils.saveFileLocally(OpenNoticeActivity.this,lNotice,progressDialog);
                 }
             });
         }

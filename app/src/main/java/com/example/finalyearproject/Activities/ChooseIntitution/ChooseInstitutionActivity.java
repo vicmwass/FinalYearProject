@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.ChooseIntitution;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +15,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.finalyearproject.Activities.Main.MainActivity;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.Institution;
+import com.example.finalyearproject.R;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -26,13 +30,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
-import static com.example.finalyearproject.MainActivity.DNAME;
-import static com.example.finalyearproject.MainActivity.IDLIST;
+import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
+import static com.example.finalyearproject.Activities.Main.MainActivity.DNAME;
+import static com.example.finalyearproject.Activities.Main.MainActivity.IDLIST;
 
-import static com.example.finalyearproject.MainActivity.INSTITUTION_LIST;
+import static com.example.finalyearproject.Activities.Main.MainActivity.INSTITUTION_LIST;
 
-public class ChooseInstitution extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class ChooseInstitutionActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private InstitutionAdapter mInstitutionAdapter;
     private RecyclerView mInstRecycleView;

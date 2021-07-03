@@ -11,18 +11,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalYearProject">
-        <activity android:name=".AddAdmin"></activity>
-        <activity android:name=".ChooseInstitution" />
-        <activity android:name=".RegisterForInstitution" />
-        <activity android:name=".RegisterInstitution" />
-        <activity android:name=".LaunchActivity">
+        <activity android:name=".Activities.AddAdmin.AddAdminActivity"></activity>
+        <activity android:name=".Activities.ChooseIntitution.ChooseInstitutionActivity" />
+        <activity android:name=".Activities.Launch.RegisterForInstitutionActivity" />
+        <activity android:name=".Activities.Launch.RegisterInstitutionActivity" />
+        <activity android:name=".Activities.Launch.LaunchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NoticeActivity" />
+        <activity android:name=".Activities.OpenNoticeActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -34,9 +34,9 @@
                 android:resource="@xml/paths" />
         </provider>
 
-        <activity android:name=".AddNotice" />
-        <activity android:name=".AddDomain" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".Activities.AddNoticeActivity" />
+        <activity android:name=".Activities.AddDomain.AddDomainActivity" />
+        <activity android:name=".Activities.Main.MainActivity" />
     </application>
 
 </manifest>

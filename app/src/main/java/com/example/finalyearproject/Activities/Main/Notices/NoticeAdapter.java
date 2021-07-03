@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.Main.Notices;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.finalyearproject.Activities.Main.MainActivity;
+import com.example.finalyearproject.Activities.Main.SharedViewModel;
+import com.example.finalyearproject.Activities.OpenNoticeActivity;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.Notice;
+import com.example.finalyearproject.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -96,7 +102,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
         holder.rlCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent lIntent=new Intent(mContext,NoticeActivity.class);
+                Intent lIntent=new Intent(mContext, OpenNoticeActivity.class);
                 lIntent.putExtra(MainActivity.NOTICE,lNotice);
                 mContext.startActivity(lIntent);
             }

@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Modules;
 
 import java.io.Serializable;
 

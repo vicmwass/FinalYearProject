@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".Activities.AddDomain.AddDomainActivity"
     android:id="@+id/drawer_layout"
     android:fitsSystemWindows="true"
     tools:openDrawer="start"
@@ -18,13 +18,16 @@
     app:menu="@menu/navigation_menu"
     android:layout_gravity="start"
     />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddDomain">
+    tools:context=".Activities.AddDomain.AddDomainActivity">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -54,5 +57,51 @@
              />
 
     </com.google.android.material.textfield.TextInputLayout>
+    <TextView
+        android:id="@+id/select_text_admins"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/wraper_domain_name"
+        android:text="Select Admin/Admins (optional)"
+        android:layout_margin="@dimen/edit_text_margin"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/admin_recycler_view2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/select_text_admins"
+        tools:listitem="@layout/admin_users_card"
+        />
+    <CheckBox
+        android:id="@+id/set_isPrivate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/admin_recycler_view2"
+        android:text="make private"
+        android:layout_marginStart="@dimen/margin_start"
+        android:layout_marginEnd="@dimen/margin_start"
+        />
+    <LinearLayout
+        android:id="@+id/choosing_members"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_below="@id/set_isPrivate"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/select_text_members"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Members"
+            android:layout_margin="@dimen/edit_text_margin"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/members_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:listitem="@layout/admin_users_card"
+
+             />
+    </LinearLayout>
+
 </RelativeLayout>
+    </ScrollView>
 </androidx.drawerlayout.widget.DrawerLayout>

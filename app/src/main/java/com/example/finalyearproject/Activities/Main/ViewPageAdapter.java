@@ -1,10 +1,13 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.Main;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+
+import com.example.finalyearproject.Activities.Main.Notices.NoticeListFragment;
+import com.example.finalyearproject.Activities.Main.SubDomains.DomainListFragment;
 
 public class ViewPageAdapter extends FragmentPagerAdapter {
     public ViewPageAdapter(@NonNull FragmentManager fm, int behavior) {

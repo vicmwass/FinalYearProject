@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.AddAdmin;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -14,12 +14,24 @@ public class AddAdminViewModel extends ViewModel {
             new MutableLiveData<>(new HashSet<>());
     private MutableLiveData<HashSet<String>> currentAdminNameSet =
             new MutableLiveData<>(new HashSet<String>());
+    private MutableLiveData<HashSet<String>> membersOfPrivateDomain =
+            new MutableLiveData<>(new HashSet<>());
+    public MutableLiveData<HashSet<String>> getMembersOfPrivateDomain(){
+        return membersOfPrivateDomain;
+    }
+    public void setMembersOfPrivateDomain(ArrayList<String> membersOfPrivateDomain) {
+        HashSet<String> tempSet=membersOfPrivateDomain.stream().collect(Collectors.toCollection(HashSet::new));
+        this.membersOfPrivateDomain.setValue(tempSet);
+    }
     public MutableLiveData<HashSet<String>> getCurrentAdminNameSet(){
         return currentAdminNameSet;
     }
     public void setCurrentAdminNameSet(ArrayList<String> currentAdmins) {
         HashSet<String> tempSet=currentAdmins.stream().collect(Collectors.toCollection(HashSet::new));
         this.currentAdminNameSet.setValue(tempSet);
+    }
+    public MutableLiveData<HashSet<String>> getAdminNameSet(){
+        return this.adminNameSet;
     }
     public void addAdminToSet(String id){
         HashSet<String> tempSet=adminNameSet.getValue();

@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.AddAdmin;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,14 +13,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.example.finalyearproject.Activities.Main.MainActivity;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.R;
+
 import java.util.ArrayList;
 
-import static com.example.finalyearproject.LaunchActivity.INSTITUTION_CODE;
-import static com.example.finalyearproject.LaunchActivity.INSTITUTION_DETAILS;
-import static com.example.finalyearproject.MainActivity.DNAME;
+import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_CODE;
+import static com.example.finalyearproject.Activities.Main.MainActivity.DNAME;
 
 
-public class AddAdmin extends AppCompatActivity {
+public class AddAdminActivity extends AppCompatActivity {
 
     private EditText mEtAdminName1;
     private ArrayList<String> mIdList;
@@ -30,6 +33,7 @@ public class AddAdmin extends AppCompatActivity {
     private String mAdminName;
     private AddAdminViewModel mViewModel;
     private ArrayList<String> mAdminList;
+    private ArrayList<String> mMemberList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,7 @@ public class AddAdmin extends AppCompatActivity {
         getIntentExtras();
         mViewModel = new ViewModelProvider(this).get(AddAdminViewModel.class);
         mViewModel.setCurrentAdminNameSet(mAdminList);
+        if(mMemberList!=null)mViewModel.setMembersOfPrivateDomain(mMemberList);
 //        mViewModel.setCurrentAdminNameList(mAdminList);
 
         setupAdapter();
@@ -53,10 +58,11 @@ public class AddAdmin extends AppCompatActivity {
         mAdminList = lIntent.getStringArrayListExtra(MainActivity.CURRENT_ADMIN_LIST);
         mInstCode = lIntent.getStringExtra(INSTITUTION_CODE);
         mDomainName=lIntent.getStringExtra(DNAME);
+        mMemberList = lIntent.getStringArrayListExtra("members");
     }
 
     private void setupAdapter() {
-        AdminAdapter lAdminAdapter = new AdminAdapter(mInstCode,mViewModel);
+        AdminAdapter lAdminAdapter = new AdminAdapter(this,mInstCode,mViewModel);
         RecyclerView adminRecycleView = findViewById(R.id.admin_recycler_view);
         adminRecycleView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         adminRecycleView.setAdapter(lAdminAdapter);

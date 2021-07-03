@@ -1,4 +1,4 @@
-package com.example.finalyearproject;
+package com.example.finalyearproject.Activities.Launch;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +16,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.example.finalyearproject.Activities.Main.MainActivity;
+import com.example.finalyearproject.Activities.ChooseIntitution.ChooseInstitutionActivity;
+import com.example.finalyearproject.HelperClasses.FirebaseUtils;
+import com.example.finalyearproject.Modules.Institution;
+import com.example.finalyearproject.Modules.User;
+import com.example.finalyearproject.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,8 +31,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-import static com.example.finalyearproject.MainActivity.INSTITUTION_LIST;
-import static com.example.finalyearproject.MainActivity.SHARED_PREFS;
+import static com.example.finalyearproject.Activities.Main.MainActivity.INSTITUTION_LIST;
+import static com.example.finalyearproject.Activities.Main.MainActivity.SHARED_PREFS;
 
 public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.AuthStateListener  {
 
@@ -77,7 +83,7 @@ public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.Au
                 if (mFirebaseAuth.getCurrentUser() == null) {
                     FirebaseUtils.signIn(CREATE_INST_SIGN_IN);
                 }else{
-                    Intent lIntent=new Intent(LaunchActivity.this,RegisterInstitution.class);
+                    Intent lIntent=new Intent(LaunchActivity.this, RegisterInstitutionActivity.class);
                     startActivity(lIntent);
                 }
 
@@ -89,7 +95,7 @@ public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.Au
                 if (mFirebaseAuth.getCurrentUser() == null) {
                     FirebaseUtils.signIn(REGISTER_FOR_INST_SIGN_IN);
                 }else {
-                    Intent lIntent = new Intent(LaunchActivity.this, RegisterForInstitution.class);
+                    Intent lIntent = new Intent(LaunchActivity.this, RegisterForInstitutionActivity.class);
                     startActivity(lIntent);
                 }
             }
@@ -114,11 +120,11 @@ public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.Au
 //            mRelLoad.setVisibility(View.VISIBLE);
         }
         if(requestCode== CREATE_INST_SIGN_IN &&resultCode==RESULT_OK){
-            Intent lIntent=new Intent(LaunchActivity.this,RegisterInstitution.class);
+            Intent lIntent=new Intent(LaunchActivity.this, RegisterInstitutionActivity.class);
             startActivity(lIntent);
         }
         if(requestCode== REGISTER_FOR_INST_SIGN_IN &&resultCode==RESULT_OK){
-            Intent lIntent = new Intent(LaunchActivity.this, RegisterForInstitution.class);
+            Intent lIntent = new Intent(LaunchActivity.this, RegisterForInstitutionActivity.class);
             startActivity(lIntent);
         }
         if(requestCode== LOAD_INST_SIGN_IN &&resultCode==RESULT_OK){
@@ -207,7 +213,7 @@ public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.Au
             public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){
                     Institution selectedInst=task.getResult().toObject(Institution.class);
-                    Intent lIntent=new Intent(LaunchActivity.this,MainActivity.class);
+                    Intent lIntent=new Intent(LaunchActivity.this, MainActivity.class);
                     lIntent.putExtra(INSTITUTION_DETAILS, selectedInst);
                     lIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(lIntent);
@@ -229,7 +235,7 @@ public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.Au
                                     User lUser=lSnapshot.toObject(User.class).withId(lSnapshot.getId());
                                     ArrayList<String> lInst=lUser.getInstitutions();
                                     progressBar.setVisibility(View.GONE);
-                                    Intent lIntent=new Intent(LaunchActivity.this,ChooseInstitution.class);
+                                    Intent lIntent=new Intent(LaunchActivity.this, ChooseInstitutionActivity.class);
                                     lIntent.putExtra(INSTITUTION_LIST,lInst);
                                     startActivity(lIntent);
                                 }catch (NullPointerException e){
