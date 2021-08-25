@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,6 +30,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static com.example.finalyearproject.Activities.Main.MainActivity.INSTITUTION_LIST;
@@ -174,9 +176,7 @@ public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.Au
             if(checkSavedInstitution()){
                 getInstDetails();
             }
-
         }
-
     }
 
     @Override
@@ -190,8 +190,6 @@ public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.Au
                 FirebaseUtils.signOut();
                 invalidateOptionsMenu();
                 break;
-
-
         }
         return true;
     }
@@ -203,7 +201,6 @@ public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.Au
             return false;
         }
         return true;
-
     }
 
     private void getInstDetails() {
@@ -214,7 +211,7 @@ public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.Au
                 if(task.isSuccessful()){
                     Institution selectedInst=task.getResult().toObject(Institution.class);
                     Intent lIntent=new Intent(LaunchActivity.this, MainActivity.class);
-                    lIntent.putExtra(INSTITUTION_DETAILS, selectedInst);
+                    lIntent.putExtra(INSTITUTION_DETAILS, (Parcelable) selectedInst);
                     lIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(lIntent);
                     finish();

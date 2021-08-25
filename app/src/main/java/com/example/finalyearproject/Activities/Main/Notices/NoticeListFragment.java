@@ -17,6 +17,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.finalyearproject.Activities.Main.SharedViewModel;
 import com.example.finalyearproject.R;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 public class NoticeListFragment extends Fragment {
@@ -33,11 +35,20 @@ public class NoticeListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View lView = inflater.inflate(R.layout.notices_container, container, false);
         mViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
-        mNoticeRecyclerView = lView.findViewById(R.id.notice_recycler_view);
+        setupAdapter(lView);
+        setupSwipeRefresh(lView);
+        return lView;
+    }
+
+    public void setupAdapter(View view) {
+        mNoticeRecyclerView = view.findViewById(R.id.notice_recycler_view);
         mNoticeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mNoticeAdapter = new NoticeAdapter(getContext(),mViewModel);
         mNoticeRecyclerView.setAdapter(mNoticeAdapter);
-        mSwipeRefreshLayout = lView.findViewById(R.id.swiperefresh);
+    }
+
+    public void setupSwipeRefresh(View view) {
+        mSwipeRefreshLayout = view.findViewById(R.id.swiperefresh);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -47,15 +58,22 @@ public class NoticeListFragment extends Fragment {
 
             }
         });
-        return lView;
     }
+
     @Override
     public void onActivityCreated(@Nullable  Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         ViewModelProvider viewModelProvider = new ViewModelProvider(getActivity().getViewModelStore(),
                 ViewModelProvider.AndroidViewModelFactory.getInstance(getActivity().getApplication()));
         mViewModel =viewModelProvider.get(SharedViewModel.class);
-        mViewModel.getIdList().observe(getActivity(), new Observer<ArrayList<String>>() {
+        mViewModel.getIdList().observe(getViewLifecycleOwner(), new Observer<ArrayList<String>>() {
             @Override
             public void onChanged(@Nullable ArrayList<String> idList) {
                 mIdList=idList;
@@ -63,9 +81,5 @@ public class NoticeListFragment extends Fragment {
                 mNoticeAdapter.notifyDataSetChanged();
             }
         });
-
     }
-
-
-
 }

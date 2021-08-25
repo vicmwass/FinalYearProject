@@ -10,8 +10,13 @@ import com.example.finalyearproject.Activities.Main.Notices.NoticeListFragment;
 import com.example.finalyearproject.Activities.Main.SubDomains.DomainListFragment;
 
 public class ViewPageAdapter extends FragmentPagerAdapter {
+
+
+    private final String[] mTitles;
+
     public ViewPageAdapter(@NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
+        mTitles = new String[]{"Notices","Subdomains"};
     }
 
     @NonNull
@@ -19,7 +24,7 @@ public class ViewPageAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return new NoticeListFragment();
+                return new NotifyFragment();
             case 1:
                 return new DomainListFragment();
         }
@@ -35,9 +40,19 @@ public class ViewPageAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         switch (position){
-            case 0: return "Notices";
-            case 1: return "Subdomains";
+            case 0: return mTitles[position];
+            case 1: return mTitles[position];
+
         }
         return null;
+    }
+
+    public void switchTitles(int type){
+        if(type==0){
+            mTitles[0]="Chat page";
+        }else {
+            mTitles[0]="Notices";
+        }
+        notifyDataSetChanged();
     }
 }

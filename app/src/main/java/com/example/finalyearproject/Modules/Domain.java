@@ -7,7 +7,15 @@ public class Domain {
     private String id;
     private ArrayList<String> adminList=new ArrayList<String>();
     private Boolean isPrivate=false;
+    private Boolean isChatGroup=false;
 
+    public Boolean getChatGroup() {
+        return isChatGroup;
+    }
+
+    public void setChatGroup(Boolean chatGroup) {
+        isChatGroup = chatGroup;
+    }
 
     private ArrayList<String> memberList=new ArrayList<String>();
 

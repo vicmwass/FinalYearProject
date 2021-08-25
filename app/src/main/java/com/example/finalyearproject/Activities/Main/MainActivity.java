@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
@@ -15,17 +17,23 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.finalyearproject.Activities.AboutInstitution;
 import com.example.finalyearproject.Activities.AddAdmin.AddAdminActivity;
 import com.example.finalyearproject.Activities.AddDomain.AddDomainActivity;
 import com.example.finalyearproject.Activities.AddNoticeActivity;
 import com.example.finalyearproject.Activities.Launch.LaunchActivity;
 import com.example.finalyearproject.Activities.ChooseIntitution.ChooseInstitutionActivity;
+import com.example.finalyearproject.Activities.Launch.RegisterForInstitutionActivity;
+import com.example.finalyearproject.Activities.Main.ChatGroup.ChatFragment;
+import com.example.finalyearproject.Activities.Main.Notices.NoticeListFragment;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.Institution;
+import com.example.finalyearproject.Modules.NavObjects;
 import com.example.finalyearproject.Modules.User;
 import com.example.finalyearproject.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -35,7 +43,6 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,9 +60,11 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
     public static final String INSTITUTION_LIST = "institutionList";
     public static final String SHARED_PREFS = "SharedPrefs";
      public static final String CURRENT_ADMIN_LIST = "currentAdminList";
+     public static final String NAV_OBJECT = "navObject";
      public SharedViewModel mViewModel;
     ArrayList<String> mIdList;
     ArrayList<String> mDomainNameList=new ArrayList<String>();
+    String mDomainName;
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
     private ViewPageAdapter mViewPageAdapter;
@@ -66,16 +75,20 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
     private Boolean mFinalExit =false;
     private Institution mInstDetails;
     private Menu mOptionMenu;
+    private Boolean mIsAdmin;
+    private Boolean mInitial =true;
+//     private int mChatLevel=0;
 
 
-    @Override
+     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+         setContentView(R.layout.activity_main);
         Intent lIntent=getIntent();
-        mInstDetails = (Institution) lIntent.getSerializableExtra(INSTITUTION_DETAILS);
-        mInstCode = mInstDetails.getCode();
+        mInstDetails = (Institution) lIntent.getParcelableExtra(INSTITUTION_DETAILS);
+         mInstCode = mInstDetails.getCode();
+
         setupViewModel();
         setupNavigatioView();
         setupAdapter();
@@ -98,12 +111,46 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
         mViewPageAdapter = new ViewPageAdapter(getSupportFragmentManager(),0);
         mTabLayout.setupWithViewPager(mViewPager);
         mViewPager.setAdapter(mViewPageAdapter);
+
     }
+
+     private void changefragment(int type ) {
+         Fragment newFragment;
+         if(type==0){
+             newFragment = ChatFragment.newInstance();
+             replaceFragment(newFragment,R.id.notice_fragment,"CHAT_FRAGMENT","NOTICE_FRAGMENT");
+         }else {
+             newFragment = new NoticeListFragment();
+             replaceFragment(newFragment,R.id.chat_fragment,"NOTICE_FRAGMENT","CHAT_FRAGMENT");
+         }
+
+
+
+         mViewPageAdapter.switchTitles(type);
+//         mViewPager.getAdapter().notifyDataSetChanged();
+
+
+     }
+
+
+     public void replaceFragment(Fragment fragment,int id, String addTag, String removeTag){
+         getSupportFragmentManager();
+         FragmentTransaction trans = getSupportFragmentManager()
+                 .beginTransaction();
+         trans.replace(R.id.root_frame, fragment,addTag);
+         trans.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+         trans.addToBackStack(null);
+         trans.commit();
+         Fragment removeFragment = getSupportFragmentManager().findFragmentByTag(removeTag);
+         if(removeFragment != null)
+             getSupportFragmentManager().beginTransaction().remove(removeFragment).commitNow();
+     }
 
     private void setupNavigatioView() {
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
+        getSupportActionBar().setTitle(mInstDetails.getName());
+
 
         mDrawerLayout =findViewById(R.id.drawer_layout);
         mNavigationView =findViewById(R.id.nav_view);
@@ -117,31 +164,94 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
         //to lIntentmake navigation drawer clickable
         mNavigationView.setNavigationItemSelectedListener(this);
 
-
     }
 
     private void setupViewModel() {
         mViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
+
+
+        String userId= FirebaseAuth.getInstance().getUid();
+        if(mInstDetails.getAdminList().contains(userId)){
+            mViewModel.setAdminLevel("Main");
+            mViewModel.setDomainAdminList(new ArrayList<String>(Arrays.asList(userId)));
+        }
         mViewModel.setInstCode(mInstCode);
         mViewModel.getIdList().observe(this, new Observer<ArrayList<String>>() {
             @Override
             public void onChanged(@Nullable ArrayList<String> idList) {
                 mIdList=idList;
+                if(mViewModel.getPrivacyLevel().getValue()<1){
+                    if(idList.contains(mViewModel.getAdminLevel().getValue())||mViewModel.getAdminLevel().getValue().equals("Main")){
+                        mIsAdmin =true;
+                        mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,true);
+                    }else {
+                        mIsAdmin =false;
+                        mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,false);
+                }}
+
+                if(mIdList.size()>0&&mViewModel.getChatGroupIds().getValue().contains(mIdList.get(mIdList.size()-1))){
+                    if(!mViewModel.getIsChatGroup().getValue()) {
+                        mViewModel.setIsChatGroup(true);
+                    }
+                }else {
+                    if(mViewModel.getIsChatGroup().getValue()) {
+                        mViewModel.setIsChatGroup(false);
+                    }
+                }
+
+
+
+            }});
+        mViewModel.getIsChatGroup().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if(!mInitial){
+                if(aBoolean){
+                    changefragment(0);
+                }else{
+                    changefragment(1);
+                }
+            }
+                mInitial=false;
             }
         });
+
+//        mViewModel.getChatGroupIds().observe(this, new Observer<HashSet<String>>() {
+//            @Override
+//            public void onChanged(HashSet<String> strings) {
+//                if(strings.contains(mIdList.get(mIdList.size()-1))){
+//
+//                }
+//            }
+//        });
+
         mViewModel.getDomainNameList().observe(this, new Observer<ArrayList<String>>() {
             @Override
             public void onChanged(ArrayList<String> domainNameList) {
                 mDomainNameList=domainNameList;
+                mDomainName=mDomainNameList.get(mDomainNameList.size()-1);
+                if(!mDomainName.equals("main"))
+                getSupportActionBar().setSubtitle(mDomainName);
+            }});
+
+
+
+
+        mViewModel.getPrivacyLevel().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if(integer>0){
+
+                    if(mIdList.contains(mViewModel.getPrivateDomainAdminLevel().getValue())){
+                        mIsAdmin =true;
+                        mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,true);
+                    }else{
+                        mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,false);
+                        mIsAdmin =false;
+                    }
+                }
             }
         });
-        String userId= FirebaseUtils.sFirebaseAuth.getUid();
-        if(userId.equals(mInstDetails.getCreator())){
-            mViewModel.setDomainAdminList(new ArrayList<String>(Arrays.asList(mInstDetails.getCreator())));
-        }
-        if(userId.equals(mInstDetails.getCreator())|| mInstDetails.getAdminList().contains(FirebaseUtils.sFirebaseAuth.getUid())){
-            mViewModel.setAdminLevel("Main");
-        }
 
     }
 
@@ -152,6 +262,8 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
         mOptionMenu = menu;
         return true;
     }
+
+
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         if(mViewModel.getPrivacyLevel().getValue()>0){
@@ -162,10 +274,7 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                         menu.setGroupVisible(R.id.for_admin, true);
                     }else {
                         menu.setGroupVisible(R.id.for_admin, false);
-                    }
-
-                }
-            });
+                    }}});
         }else{
             mViewModel.getAdminLevel().observe(this, new Observer<String>() {
                 @Override
@@ -174,45 +283,33 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                         menu.setGroupVisible(R.id.for_admin, true);
                     }else{
                         menu.setGroupVisible(R.id.for_admin, false);
-                    }
-                }
-            });
+                    }}});
         }
-
-
-
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        ArrayList<String> adminList;
+        if(mViewModel.getPrivacyLevel().getValue()>0)
+            adminList=mViewModel.getPrivateCurrentAdminList().getValue();
+        else adminList=mViewModel.getCurrentAdminList().getValue();
+        NavObjects lNavObjects=new NavObjects(mIdList,mInstDetails,mDomainName,
+                adminList,mViewModel.getPrivateMemberList().getValue(), mIsAdmin);
         switch (item.getItemId()){
             case R.id.to_new_domains:
                 Intent DIntent=new Intent(this, AddDomainActivity.class);
-                DIntent.putExtra(IDLIST, mIdList);
-                DIntent.putExtra(INSTITUTION_DETAILS, mInstDetails);
-                if(mViewModel.getPrivacyLevel().getValue()>0){
-                    DIntent.putExtra(CURRENT_ADMIN_LIST,mViewModel.getPrivateCurrentAdminList().getValue());
-                    DIntent.putExtra("members",mViewModel.getPrivateMemberList().getValue());
-                }else DIntent.putExtra(CURRENT_ADMIN_LIST,mViewModel.getCurrentAdminList().getValue());
+                DIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
                 startActivity(DIntent);
                 break;
             case R.id.to_new_notice:
                 Intent NIntent =new Intent(this, AddNoticeActivity.class);
-                NIntent.putExtra(IDLIST, mIdList);
-                NIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
-                NIntent.putExtra(INSTITUTION_DETAILS, mInstDetails);
-                startActivity(NIntent);
+                NIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
+                startActivity(NIntent);mInstDetails.getCode();
                 break;
             case R.id.add_admin:
                 Intent AIntent =new Intent(this, AddAdminActivity.class);
-                AIntent.putExtra(IDLIST, mIdList);
-                AIntent.putExtra(DNAME, mDomainNameList.get(mDomainNameList.size()-1));
-                if(mViewModel.getPrivacyLevel().getValue()>0){
-                    AIntent.putExtra(CURRENT_ADMIN_LIST,mViewModel.getPrivateCurrentAdminList().getValue());
-                    AIntent.putExtra("members",mViewModel.getPrivateMemberList().getValue());
-                }else AIntent.putExtra(CURRENT_ADMIN_LIST,mViewModel.getCurrentAdminList().getValue());
-                AIntent.putExtra(INSTITUTION_CODE, mInstCode);
+                AIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
                 startActivity(AIntent);
                 break;
             case R.id.sign_out:
@@ -235,11 +332,16 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
         int sz = mIdList.size();
 
         if(sz>0){
-            if(mViewModel.getPrivacyLevel().getValue()>0)mViewModel.decrementPrivacyLevel();
+            if(mViewModel.getChatGroupIds().getValue().contains(mIdList.get(mIdList.size()-1))){
+                mViewModel.removeChatGroupId(mIdList.get(mIdList.size()-1));
+            }
+
             mFinalExit =false;
             mViewModel.removePreviousAdmins();
             mIdList.remove(sz-1);
             mDomainNameList.remove(sz);
+            mViewModel.setDomainNameList(mDomainNameList);
+            if(mViewModel.getPrivacyLevel().getValue()>0)mViewModel.decrementPrivacyLevel();
             mViewModel.setIdList(mIdList);
 
         }else{
@@ -267,66 +369,71 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
         SharedPreferences lSharedPreferences=getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
         SharedPreferences.Editor lEditor=lSharedPreferences.edit();
         lEditor.remove(INSTITUTION_CODE).commit();
-
-
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        navigationSwitch(this,item, mIdList, mInstDetails, mDrawerLayout,  mDomainNameList.get(mDomainNameList.size()-1));
+        ArrayList<String> adminList;
+        if(mViewModel.getPrivacyLevel().getValue()>0)
+            adminList=mViewModel.getPrivateCurrentAdminList().getValue();
+        else adminList=mViewModel.getCurrentAdminList().getValue();
+        NavObjects lNavObjects=new NavObjects(mIdList,mInstDetails,mDomainNameList.get(mDomainNameList.size()-1),adminList,mViewModel.getPrivateMemberList().getValue(),mIsAdmin);
+        navigationSwitch(this,item,lNavObjects, mDrawerLayout);
         return true;
     }
 
-    public static void navigationSwitch(Activity activity, @NotNull MenuItem item, ArrayList<String> idList, Institution instDetails, DrawerLayout drawerLayout, String domainName) {
+    public static void navigationSwitch(Activity activity, MenuItem item,NavObjects navObjects, DrawerLayout drawerLayout) {
         switch (item.getItemId()){
             case R.id.nav_home:
                 Intent i = new Intent(activity, MainActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT|Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 activity.startActivity(i);
-//                Intent lIntent=new Intent(activity, MainActivity.class);
-//                lIntent.putExtra(IDLIST, idList);
-//                lIntent.putExtra(INSTITUTION_DETAILS, instDetails);
-//                activity.startActivity(lIntent);
-//                drawerLayout.closeDrawer(GravityCompat.START);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.to_new_domains:
                 Intent DIntent=new Intent(activity, AddDomainActivity.class);
-                DIntent.putExtra(IDLIST, idList);
-                DIntent.putExtra(INSTITUTION_DETAILS, instDetails);
-                DIntent.putExtra(DNAME, domainName);
+                DIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
                 activity.startActivity(DIntent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.to_new_notice:
                 Intent NIntent =new Intent(activity, AddNoticeActivity.class);
-                NIntent.putExtra(IDLIST, idList);
-                NIntent.putExtra(DNAME, domainName);
-                NIntent.putExtra(INSTITUTION_DETAILS, instDetails);
+                NIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
                 activity.startActivity(NIntent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
             case R.id.choose_institution:
-                chooseInstitution(activity, idList, instDetails, drawerLayout, domainName);
+                chooseInstitution(activity,navObjects, drawerLayout);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.add_institution:
+                Intent RIntent =new Intent(activity, RegisterForInstitutionActivity.class);
+                RIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
+                activity.startActivity(RIntent);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.about_institution:
+                Intent AIIntent =new Intent(activity, AboutInstitution.class);
+                AIIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
+                activity.startActivity(AIIntent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
 
         }
     }
 
-    public static void chooseInstitution(Activity activity,ArrayList<String> idList, Institution instDetails, DrawerLayout drawerLayout, String domainName) {
+    public static void chooseInstitution(Activity activity,NavObjects navObjects, DrawerLayout drawerLayout) {
         FirebaseUtils.FIRESTORE.collection(FirebaseUtils.USERS)
                 .document(FirebaseUtils.sFirebaseAuth.getUid()).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if(task.isSuccessful()){
                             DocumentSnapshot lSnapshot=task.getResult();
                             User lUser=lSnapshot.toObject(User.class).withId(lSnapshot.getId());
                             ArrayList<String> lInst=lUser.getInstitutions();
                             Intent lIntent=new Intent(activity, ChooseInstitutionActivity.class);
-                            lIntent.putExtra(IDLIST, idList);
-                            lIntent.putExtra(DNAME, domainName);
-                            lIntent.putExtra(INSTITUTION_DETAILS, instDetails);
+                            lIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
                             lIntent.putExtra(INSTITUTION_LIST,lInst);
                             activity.startActivity(lIntent);
 

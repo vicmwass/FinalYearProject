@@ -1,7 +1,6 @@
 package com.example.finalyearproject.Activities.AddDomain;
 
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.finalyearproject.Activities.AddAdmin.AddAdminViewModel;
 
@@ -9,32 +8,33 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class AddDomainViewModel extends AddAdminViewModel {
-    private MutableLiveData<ArrayList<String>> membersNameList =
+    private MutableLiveData<ArrayList<String>> membersIdList =
             new MutableLiveData<>(new ArrayList<String>());
-    public MutableLiveData<HashSet<String>> getMembersNameSet() {
-        return membersNameSet;
-    }
-
-    private MutableLiveData<HashSet<String>> membersNameSet =
+    private MutableLiveData<HashSet<String>> membersIdSet =
             new MutableLiveData<>(new HashSet<>());
+
+
+    public MutableLiveData<HashSet<String>> getMembersIdSet() {
+        return membersIdSet;
+    }
     public void addMemberToSet(String id){
-        HashSet<String> tempSet=membersNameSet.getValue();
+        HashSet<String> tempSet= membersIdSet.getValue();
         tempSet.add(id);
-        this.membersNameSet.setValue(tempSet);
+        this.membersIdSet.setValue(tempSet);
     }
     public void removeMemberFromSet(String id){
-        HashSet<String> tempSet=membersNameSet.getValue();
+        HashSet<String> tempSet= membersIdSet.getValue();
         tempSet.remove(id);
         removeAdminFromSet(id);
-        this.membersNameSet.setValue(tempSet);
+        this.membersIdSet.setValue(tempSet);
 
     }
-    public MutableLiveData<ArrayList<String>> getMembersNameList(){
-        HashSet<String> tempSet=membersNameSet.getValue();
-        ArrayList<String> tempList=this.membersNameList.getValue();
+    public MutableLiveData<ArrayList<String>> getMembersIdList(){
+        HashSet<String> tempSet= membersIdSet.getValue();
+        ArrayList<String> tempList=this.membersIdList.getValue();
         tempList.addAll(tempSet);
-        this.membersNameList.setValue(tempList);
-        return membersNameList;
+        this.membersIdList.setValue(tempList);
+        return membersIdList;
     }
 
 }

@@ -40,11 +40,30 @@ public class DomainListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull  View view, @Nullable  Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
-        setupAdapter(view);
+        setupViewModel(view);
         setupSwipeRefresh(view);
 
     }
+
+    public void setupViewModel(@NotNull View view) {
+        mViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
+        setupAdapter(view);
+        mViewModel.getIdList().observe(getViewLifecycleOwner(), new Observer<ArrayList<String>>() {
+            @Override
+            public void onChanged(@Nullable ArrayList<String> idList) {
+                mIdList=idList;
+                mDomainsAdapter.populateData(idList);
+                mDomainsAdapter.notifyDataSetChanged();
+            }
+        });
+        mViewModel.getDomainNameList().observe(getViewLifecycleOwner(), new Observer<ArrayList<String>>() {
+            @Override
+            public void onChanged(ArrayList<String> domainNameList) {
+                mDomainsAdapter.setDomainNameList(domainNameList);
+            }
+        });
+    }
+
 
     public void setupSwipeRefresh(@NotNull View view) {
         mSwipeRefreshLayout = view.findViewById(R.id.swiperefresh);
@@ -69,20 +88,7 @@ public class DomainListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable  Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel.getIdList().observe(getViewLifecycleOwner(), new Observer<ArrayList<String>>() {
-            @Override
-            public void onChanged(@Nullable ArrayList<String> idList) {
-                mIdList=idList;
-                mDomainsAdapter.populateData(idList);
-                mDomainsAdapter.notifyDataSetChanged();
-            }
-        });
-        mViewModel.getDomainNameList().observe(getViewLifecycleOwner(), new Observer<ArrayList<String>>() {
-            @Override
-            public void onChanged(ArrayList<String> domainNameList) {
-                mDomainsAdapter.setDomainNameList(domainNameList);
-            }
-        });
+
     }
 
 }

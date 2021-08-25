@@ -11,6 +11,24 @@ public class Notice implements Serializable {
     private String domainName;
     private String description;
     private String Id;
+    private Long timeStamp;
+    private boolean isCommentable=false;
+
+    public Long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public void setCommentable(boolean commentable) {
+        isCommentable = commentable;
+    }
+
+    public boolean isCommentable() {
+        return isCommentable;
+    }
 
     public String getSender() {
         return sender;

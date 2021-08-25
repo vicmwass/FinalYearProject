@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    android:id="@+id/notice_fragment"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.Main.Notices.NoticeListFragment">
+
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -20,3 +29,4 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
+</FrameLayout>

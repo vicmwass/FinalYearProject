@@ -23,11 +23,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.example.finalyearproject.Activities.Main.MainActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.Institution;
+import com.example.finalyearproject.Modules.NavObjects;
 import com.example.finalyearproject.Modules.Notice;
 import com.example.finalyearproject.R;
 import com.google.android.gms.tasks.Continuation;
@@ -35,6 +37,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -43,13 +46,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
-import static com.example.finalyearproject.Activities.Main.MainActivity.DNAME;
-import static com.example.finalyearproject.Activities.Main.MainActivity.IDLIST;
+import static com.example.finalyearproject.Activities.Main.MainActivity.NAV_OBJECT;
 
 public class AddNoticeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private EditText mEtSender;
     private EditText mEtSubject;
     private TextView mTvUpload;
     private Button mButton;
@@ -65,22 +65,26 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
     private NavigationView mNavigationView;
     private DrawerLayout mDrawerLayout;
     private Institution mInstDetails;
+    private NavObjects mNavObjects;
+    private RadioGroup mRadioGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        FirebaseUtils.signInAnonymously(this);
         setContentView(R.layout.activity_add_notice);
-        initializeViews();
-
-        setupNavigatioView();
 
         Intent lIntent=getIntent();
-        mIdList = lIntent.getStringArrayListExtra(IDLIST);
-        mDomainName=lIntent.getStringExtra(DNAME);
-        mInstDetails = (Institution) lIntent.getSerializableExtra(INSTITUTION_DETAILS);
+        mNavObjects = (NavObjects) lIntent.getParcelableExtra(NAV_OBJECT);
+        mIdList = mNavObjects.getIdList();
+        mInstDetails = mNavObjects.getInstDetails();
         mInstCode = mInstDetails.getCode();
-        mNotice = new Notice();
+        mDomainName= mNavObjects.getDomainName();
+        initializeViews();
+        setupNavigationView();
+
+
+
 
     }
     @Override
@@ -90,14 +94,15 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
     }
 
     private void initializeViews() {
-        mEtSender = findViewById(R.id.et_sender);
         mEtSubject = findViewById(R.id.et_subject);
         mDescription = findViewById(R.id.et_description);
         mTvUpload = findViewById(R.id.tv_upload_file);
+        mRadioGroup = findViewById(R.id.comments);
         mButton = findViewById(R.id.upload_button);
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
+        getSupportActionBar().setTitle(mInstDetails.getName());
+        getSupportActionBar().setSubtitle(mDomainName);
 
         mDrawerLayout =findViewById(R.id.drawer_layout);
         mNavigationView =findViewById(R.id.nav_view);
@@ -134,7 +139,7 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
         });
     }
 
-    private void setupNavigatioView() {
+    private void setupNavigationView() {
         mNavigationView.bringToFront();//when navdrawer items clicked show that color to represent click
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
@@ -144,19 +149,20 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
         mNavigationView.setNavigationItemSelectedListener(this);
 
         mNavigationView.setCheckedItem(R.id.to_new_notice);
+
+        if(mNavObjects.getIsAdmin()){
+            mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,true);
+        }else {
+            mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,false);
+        }
     }
 
 
     private Boolean saveDetails(){
-        Notice lNotice=new Notice();
-        String lSender=mEtSender.getText().toString().trim();
+        mNotice=new Notice();
         String lSubject=mEtSubject.getText().toString().trim();
         String lDescription=mDescription.getText().toString().trim();
-        if(lSender.length() == 0){
-            mEtSender.setError("Sender is Required");
-            mEtSender.requestFocus();
-            return false;
-        }
+
         if(lSubject.length() == 0){
             mEtSubject.setError("Subject is Required");
             mEtSubject.requestFocus();
@@ -165,8 +171,13 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
         if(lDescription.length()!=0){
             mNotice.setDescription(lDescription);
         }
+        switch (mRadioGroup.getCheckedRadioButtonId()) {
+            case R.id.comment_allow:
+                mNotice.setCommentable(true);
+
+        }
         mNotice.setDomainName(mDomainName);
-        mNotice.setSender(lSender);
+        mNotice.setSender(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
         mNotice.setSubject(lSubject);
         mNotice.setFileName(mTvUpload.getText().toString());
 
@@ -266,7 +277,7 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
-        MainActivity.navigationSwitch(this,item, mIdList, mInstDetails, mDrawerLayout, mDomainName);
+        MainActivity.navigationSwitch(this,item,mNavObjects, mDrawerLayout);
         return true;
     }
 

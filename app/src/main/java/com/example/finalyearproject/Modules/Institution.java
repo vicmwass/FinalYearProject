@@ -1,14 +1,37 @@
 package com.example.finalyearproject.Modules;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Institution implements Serializable {
+public class Institution implements Serializable, Parcelable {
 
     private String name;
     private String code;
     private String creator;
     private ArrayList<String> adminList=new ArrayList<String>();
+    public Institution(){}
+
+    protected Institution(Parcel in) {
+        name = in.readString();
+        code = in.readString();
+        creator = in.readString();
+        adminList = in.createStringArrayList();
+    }
+
+    public static final Creator<Institution> CREATOR = new Creator<Institution>() {
+        @Override
+        public Institution createFromParcel(Parcel in) {
+            return new Institution(in);
+        }
+
+        @Override
+        public Institution[] newArray(int size) {
+            return new Institution[size];
+        }
+    };
 
     public String getName() {
         return name;
@@ -47,4 +70,17 @@ public class Institution implements Serializable {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(code);
+        dest.writeString(creator);
+        dest.writeStringList(adminList);
+
+    }
 }

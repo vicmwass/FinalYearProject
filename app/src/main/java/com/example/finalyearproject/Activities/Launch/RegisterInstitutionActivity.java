@@ -1,12 +1,15 @@
 package com.example.finalyearproject.Activities.Launch;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.finalyearproject.Activities.Main.MainActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
@@ -14,10 +17,17 @@ import com.example.finalyearproject.Modules.InstUser;
 import com.example.finalyearproject.Modules.Institution;
 import com.example.finalyearproject.Modules.User;
 import com.example.finalyearproject.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
+import static com.example.finalyearproject.HelperClasses.FirebaseUtils.FIRESTORE;
+import static com.example.finalyearproject.HelperClasses.FirebaseUtils.INSTITUTIONS;
 
 public class RegisterInstitutionActivity extends AppCompatActivity {
 
@@ -42,7 +52,7 @@ public class RegisterInstitutionActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(saveDetails()){
                     Intent lIntent=new Intent(RegisterInstitutionActivity.this, MainActivity.class);
-                    lIntent.putExtra("InstitutionCode", mInst.getCode());
+                    lIntent.putExtra(INSTITUTION_DETAILS, (Parcelable) mInst);
                     startActivity(lIntent);
                 }
 
@@ -75,5 +85,26 @@ public class RegisterInstitutionActivity extends AppCompatActivity {
         String words[] = name.split(" ");
         int rand =(int)Math.round((Math.random()*((9000-1000)+1))+9000);
         mInst.setCode(words[0]+rand);
+    }
+
+    private void saveInstitution(){
+        final DocumentReference institutionRef= FIRESTORE.collection(INSTITUTIONS).document(mInst.getCode());
+        institutionRef.set(mInst)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(RegisterInstitutionActivity.this,"Added successful",Toast.LENGTH_LONG).show();
+//                        Log.d("Firestore", "Document updated with ID: " + PatientPostRef.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(RegisterInstitutionActivity.this,"Failed to add",Toast.LENGTH_LONG).show();
+//                        Log.e("Firestore", "Error updating document", e);
+                    }
+                });
+
+
     }
 }

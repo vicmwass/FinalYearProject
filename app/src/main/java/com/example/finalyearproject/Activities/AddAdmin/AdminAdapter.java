@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.finalyearproject.Activities.AddDomain.AddDomainViewModel;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.InstUser;
+import com.example.finalyearproject.Modules.Institution;
 import com.example.finalyearproject.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
@@ -30,8 +33,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHolder> {
+public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHolder> implements Filterable {
     ArrayList<InstUser> mInstUserList=new ArrayList<InstUser>();
+    ArrayList<InstUser> mInstUserPreFilterList=new ArrayList<InstUser>();
     ArrayList<InstUser> mAllInstUserList=new ArrayList<InstUser>();
     Activity mActivity;
 //    ArrayList<String> mInstNameList;
@@ -45,21 +49,23 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
         this.mInstCode=instCode;
         this.mViewModel=viewModel;
         this.mActivity=activity;
-        mCurrentAdmins = mViewModel.getCurrentAdminNameSet().getValue();
+        mCurrentAdmins = mViewModel.getCurrentAdminSet().getValue();
         mMembersOfPrivateDomain = mViewModel.getMembersOfPrivateDomain().getValue();
         populateData();
 
     }
 
     public void includeAllPotentialAdmins() {
+        mViewModel.clearAdminSet();
         mInstUserList.clear();
+        mInstUserPreFilterList.clear();
         for (InstUser lUser:mAllInstUserList){
             if(!mCurrentAdmins.contains(lUser.getUserId())){
                 mInstUserList.add(lUser);
-                AdminAdapter.this.notifyDataSetChanged();
             }
         }
-
+        mInstUserPreFilterList.addAll(mInstUserList);
+        AdminAdapter.this.notifyDataSetChanged();
     }
 
     private void populateData() {
@@ -104,15 +110,18 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
         });
     }
     public void includeMembersOnly(AddDomainViewModel domainViewModel){
-        domainViewModel.getMembersNameSet().observe((LifecycleOwner) mActivity, new Observer<HashSet<String>>() {
+        mViewModel.clearAdminSet();
+        domainViewModel.getMembersIdSet().observe((LifecycleOwner) mActivity, new Observer<HashSet<String>>() {
             @Override
             public void onChanged(HashSet<String> strings) {
                 mInstUserList.clear();
+                mInstUserPreFilterList.clear();
                 for (InstUser lUser:mAllInstUserList){
                     if(strings.contains(lUser.getUserId())){
                         mInstUserList.add(lUser);
                     }
                 }
+                mInstUserPreFilterList.addAll(mInstUserList);
                 AdminAdapter.this.notifyDataSetChanged();
             }
         });
@@ -131,7 +140,7 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
     public void onBindViewHolder(@NonNull @NotNull AdminAdapter.AdminViewHolder holder, int position) {
         InstUser lInstUser =mInstUserList.get(position);
         holder.mTvName.setText(lInstUser.getEmail());
-        mViewModel.getAdminNameSet().observe((LifecycleOwner) mActivity, new Observer<HashSet<String>>() {
+        mViewModel.getAdminIdSet().observe((LifecycleOwner) mActivity, new Observer<HashSet<String>>() {
             @Override
             public void onChanged(HashSet<String> strings) {
                 if(strings.contains(lInstUser.getUserId())){
@@ -163,6 +172,39 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
     public int getItemCount() {
         return mInstUserList.size();
     }
+
+    @Override
+    public Filter getFilter() {
+        return instUserFilter;
+    }
+
+    private Filter instUserFilter=new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            ArrayList<InstUser> lFilteredList=new ArrayList<InstUser>();
+            if(constraint==null||constraint.length()==0){
+                lFilteredList.addAll(mInstUserPreFilterList);
+            }else {
+                String lFilterPattern=constraint.toString().toLowerCase().trim();
+                for (InstUser lUser:mInstUserPreFilterList){
+                    if(lUser.getEmail().contains(lFilterPattern)){
+                        lFilteredList.add(lUser);
+                    }
+
+                }
+            }
+            FilterResults  lResults=new FilterResults();
+            lResults.values=lFilteredList;
+            return lResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            mInstUserList.clear();
+            mInstUserList.addAll((ArrayList)results.values);
+            AdminAdapter.this.notifyDataSetChanged();
+        }
+    };
 
     public class AdminViewHolder extends RecyclerView.ViewHolder{
 

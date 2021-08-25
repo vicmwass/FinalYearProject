@@ -106,10 +106,7 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
         holder.rlCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mIdList.add(lDomain.getId());
-                mViewModel.setIdList(mIdList);
-                mDomainNameList.add(lDomain.getName());
-                mViewModel.setDomainNameList(mDomainNameList);
+
                 if (!lDomain.getPrivate()){
                     mViewModel.setDomainAdminList(lDomain.getAdminList());
                     if(mViewModel.getPrivacyLevel().getValue()>0){
@@ -130,6 +127,16 @@ public class DomainsAdapter extends RecyclerView.Adapter<DomainsAdapter.DomainsV
                         mViewModel.setPrivateDomainAdminLevel(lDomain.getId());
                     }
                 }
+
+                if (lDomain.getChatGroup()){
+                    mViewModel.addChatGroupId(lDomain.getId());
+                }
+
+                mIdList.add(lDomain.getId());
+                mViewModel.setIdList(mIdList);
+                mDomainNameList.add(lDomain.getName());
+                mViewModel.setDomainNameList(mDomainNameList);
+
 
             }
         });

@@ -21,6 +21,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
@@ -45,7 +46,7 @@ public class InstitutionAdapter extends RecyclerView.Adapter<InstitutionAdapter.
                     if(task.isSuccessful()){
                         Institution selectedInst=task.getResult().toObject(Institution.class);
                         Intent lIntent=new Intent(mActivity, MainActivity.class);
-                        lIntent.putExtra(INSTITUTION_DETAILS, selectedInst);
+                        lIntent.putExtra(INSTITUTION_DETAILS, (Serializable)selectedInst);
                         lIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         mActivity.startActivity(lIntent);
                         mActivity.finish();

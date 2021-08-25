@@ -57,6 +57,7 @@
              />
 
     </com.google.android.material.textfield.TextInputLayout>
+
     <TextView
         android:id="@+id/select_text_admins"
         android:layout_width="match_parent"
@@ -70,12 +71,41 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/select_text_admins"
         tools:listitem="@layout/admin_users_card"
+        tools:itemCount="2"
         />
+    <RadioGroup
+        android:id="@+id/categories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/admin_recycler_view2"
+        android:layout_marginBottom="@dimen/edit_text_margin">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select subdomain category"
+            android:layout_margin="@dimen/edit_text_margin"/>
+        <RadioButton
+            android:id="@+id/notice_rb"
+            android:text="make notice group"
+            android:checked="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="7dp"/>
+        <RadioButton
+            android:id="@+id/chatGroup_rb"
+            android:text="make chat group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="7dp"/>
+
+    </RadioGroup>
+
+
     <CheckBox
         android:id="@+id/set_isPrivate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/admin_recycler_view2"
+        android:layout_below="@+id/categories"
         android:text="make private"
         android:layout_marginStart="@dimen/margin_start"
         android:layout_marginEnd="@dimen/margin_start"

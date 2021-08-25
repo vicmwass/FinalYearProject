@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/save_admin"
         android:title="Save admin"
         />
+<!--    <item android:id="@+id/search_bar"-->
+<!--        android:title="Search"-->
+<!--        android:icon="@drawable/search_24"-->
+<!--        app:showAsAction="ifRoom|collapseActionView"-->
+<!--        app:actionViewClass="android.widget.SearchView"/>-->
+
 </menu>

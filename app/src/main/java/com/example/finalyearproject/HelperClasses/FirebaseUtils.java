@@ -15,6 +15,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import com.example.finalyearproject.Modules.ChatMessage;
+import com.example.finalyearproject.Modules.Comment;
 import com.example.finalyearproject.Modules.Domain;
 import com.example.finalyearproject.Modules.InstUser;
 import com.example.finalyearproject.Modules.Institution;
@@ -55,6 +57,9 @@ public class FirebaseUtils {
     public static final String USERS = "users";
     public static final String INSTUSERS = "Users";
     public static final String INSTITUTIONS1FIELD = "institutions";
+    public static final String MY_CHATS = "my_chats";
+    public static final String MY_COMMENTS = "my_comments";
+    public static final String COMMENTS = "comments";
     private static FirebaseUtils sFirebaseUtils;
     public static FirebaseAuth sFirebaseAuth;
     public static final FirebaseFirestore FIRESTORE = FirebaseFirestore.getInstance();
@@ -62,6 +67,7 @@ public class FirebaseUtils {
     public static FirebaseAuth.AuthStateListener sAuthStateListener;
     public static StorageReference sStorageReference;
     public static FirebaseStorage sFirebaseStorage;
+    public static User sUser;
 
 
 
@@ -84,6 +90,10 @@ public class FirebaseUtils {
 //                }
 //            };
         }
+    }
+
+    private static void getUser(){
+
     }
 
 
@@ -127,6 +137,7 @@ public class FirebaseUtils {
         }
 
     }
+
 
     public static void addDomainAdmin(Context context,String instCode,ArrayList<String> idList,ArrayList<String> adminList){
         DocumentReference tempDocRef= FIRESTORE.collection(INSTITUTIONS).document(instCode);
@@ -235,22 +246,6 @@ public class FirebaseUtils {
                 Log.w(TAG, "Error adding document", e);
             }
         });
-
-
-
-
-//        babyRef = mFirestore.collection("users")
-//                .document(mFirebaseAuth.getUid())
-//                .collection("children")
-//                .document(baby.getId());
-//        babyRef.update(
-//                "firstName", baby.getFirstName(),
-//                "lastName", baby.getLastName(),
-//                "dob", baby.getDob(),
-//                "sex", baby.getSex()
-//        );
-
-
     }
 
 
@@ -318,6 +313,52 @@ public class FirebaseUtils {
             }
         });
     }
+    public static void addComment(String instCode, Activity activity, Comment cmt, String noticeId){
+        final DocumentReference commentRef;
+        commentRef= FIRESTORE.collection(INSTITUTIONS).document(instCode).collection(COMMENTS)
+                .document(noticeId)
+                .collection(MY_COMMENTS)
+                .document();
+        commentRef.set(cmt)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Toast.makeText(activity,"Added successful",Toast.LENGTH_LONG).show();
+                        Log.d("Firestore", "Document updated with sender: " + cmt.getUsername());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull  Exception e) {
+                        Toast.makeText(activity,"Failed to add",Toast.LENGTH_LONG).show();
+                        Log.e("Firestore", "Failed to add notice with sender: " + cmt.getUsername() );
+                    }
+                });
+
+    }
+    public static void addChat(String instCode, Activity activity, ChatMessage msg, String domainId){
+        final DocumentReference chatRef;
+        chatRef= FIRESTORE.collection(INSTITUTIONS).document(instCode).collection("chats")
+                .document(domainId)
+                .collection(MY_CHATS)
+                .document();
+        chatRef.set(msg)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Toast.makeText(activity,"Added successful",Toast.LENGTH_LONG).show();
+                        Log.d("Firestore", "Document updated with sender: " + msg.getUsername());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull  Exception e) {
+                        Toast.makeText(activity,"Failed to add",Toast.LENGTH_LONG).show();
+                        Log.e("Firestore", "Failed to add notice with sender: " + msg.getUsername() );
+                    }
+                });
+    }
+
 
     public static void saveNotice(String instCode, Activity activity, Notice notice, String Id){
         final DocumentReference noticeRef;
@@ -488,7 +529,6 @@ public class FirebaseUtils {
                     new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
                     1);
             return false;
-
 
         }
 

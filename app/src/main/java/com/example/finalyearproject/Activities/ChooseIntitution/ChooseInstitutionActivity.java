@@ -18,6 +18,7 @@ import android.view.View;
 import com.example.finalyearproject.Activities.Main.MainActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.Institution;
+import com.example.finalyearproject.Modules.NavObjects;
 import com.example.finalyearproject.R;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentChange;
@@ -35,6 +36,7 @@ import static com.example.finalyearproject.Activities.Main.MainActivity.DNAME;
 import static com.example.finalyearproject.Activities.Main.MainActivity.IDLIST;
 
 import static com.example.finalyearproject.Activities.Main.MainActivity.INSTITUTION_LIST;
+import static com.example.finalyearproject.Activities.Main.MainActivity.NAV_OBJECT;
 
 public class ChooseInstitutionActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -50,15 +52,17 @@ public class ChooseInstitutionActivity extends AppCompatActivity implements Navi
     private String mInstCode;
     private Intent mIntent;
     private Institution mInstDetails;
+    private NavObjects mNavObjects;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_institution);
 
-        initializeViews();
         mIntent = getIntent();
         mInstList = mIntent.getStringArrayListExtra(INSTITUTION_LIST);
+
+        initializeViews();
         extrasForNavPurpose();
 
         if(mInstCode!=null){
@@ -76,22 +80,23 @@ public class ChooseInstitutionActivity extends AppCompatActivity implements Navi
     }
 
     private void extrasForNavPurpose() {
-
-        mIdList = mIntent.getStringArrayListExtra(IDLIST);
-        mDomainName = mIntent.getStringExtra(DNAME);
-        mInstDetails = (Institution) mIntent.getSerializableExtra(INSTITUTION_DETAILS);
-        if(mInstDetails!=null)mInstCode = mInstDetails.getCode();
-        mInstNameList=new ArrayList<String>(Collections.nCopies(mInstList.size(), ""));
+        mNavObjects = (NavObjects) mIntent.getParcelableExtra(NAV_OBJECT);
+        if(mNavObjects!=null){
+            mInstCode = mNavObjects.getInstDetails().getCode();
+        }
     }
 
     private void initializeViews() {
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
+        if(mNavObjects!=null){
+            getSupportActionBar().setTitle(mInstDetails.getName());
+            getSupportActionBar().setSubtitle(mDomainName);
+        }
 
         mDrawerLayout =findViewById(R.id.drawer_layout);
         mNavigationView =findViewById(R.id.nav_view);
-
+        mInstNameList=new ArrayList<String>(Collections.nCopies(mInstList.size(), ""));
     }
 
     private void hideNavigationView() {
@@ -118,6 +123,12 @@ public class ChooseInstitutionActivity extends AppCompatActivity implements Navi
         mNavigationView.setNavigationItemSelectedListener(this);
 
         mNavigationView.setCheckedItem(R.id.choose_institution);
+
+        if(mNavObjects.getIsAdmin()){
+            mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,true);
+        }else {
+            mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,false);
+        }
     }
 
     private void setupAdapter() {
@@ -162,7 +173,7 @@ public class ChooseInstitutionActivity extends AppCompatActivity implements Navi
 
     @Override
     public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
-        MainActivity.navigationSwitch(this,item, mIdList, mInstDetails, mDrawerLayout, mDomainName);
+        MainActivity.navigationSwitch(this,item,mNavObjects, mDrawerLayout);
         return true;
     }
 

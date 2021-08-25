@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.finalyearproject.Activities.Launch.LaunchActivity;
 import com.example.finalyearproject.Activities.Main.MainActivity;
 import com.example.finalyearproject.Activities.Main.SharedViewModel;
 import com.example.finalyearproject.Activities.OpenNoticeActivity;
@@ -104,6 +105,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
             public void onClick(View v) {
                 Intent lIntent=new Intent(mContext, OpenNoticeActivity.class);
                 lIntent.putExtra(MainActivity.NOTICE,lNotice);
+                lIntent.putExtra(LaunchActivity.INSTITUTION_CODE,mViewModel.getInstCode().getValue());
                 mContext.startActivity(lIntent);
             }
         });
