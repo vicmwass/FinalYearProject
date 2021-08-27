@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.finalyearproject.Activities.Main.SharedViewModel;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.ChatMessage;
+import com.example.finalyearproject.Modules.Text;
 import com.example.finalyearproject.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
-    ArrayList<ChatMessage> mChatList =new ArrayList<ChatMessage>();
+    ArrayList<Text> mChatList =new ArrayList<>();
     ArrayList <String> mIdList = new ArrayList<String>();
     Context mContext;
     private CollectionReference mChatRef;
@@ -64,7 +65,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                         switch (dc.getType()) {
                             case ADDED:
                                 String id = dc.getDocument().getId();
-                                ChatMessage lChatMessage = dc.getDocument().toObject(ChatMessage.class).withId(id);
+                                Text lChatMessage = dc.getDocument().toObject(Text.class).withId(id);
                                 mChatList.add(lChatMessage);
                                 Log.d("Chat Display", lChatMessage.getUsername());
                                 ChatAdapter.this.notifyDataSetChanged();
@@ -100,7 +101,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull ChatAdapter.ChatViewHolder holder, int position) {
-        ChatMessage chat=mChatList.get(position);
+        Text chat=mChatList.get(position);
         holder.mText.setText(chat.getMessage());
         holder.mChatContainer.setGravity(Gravity.LEFT);
         if(mFirebaseAuth.getCurrentUser().getDisplayName().equals(chat.getUsername())){

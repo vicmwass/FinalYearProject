@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.Comment;
+import com.example.finalyearproject.Modules.Text;
 import com.example.finalyearproject.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
 
-    ArrayList<Comment> mCommentsList =new ArrayList<>();
+    ArrayList<Text> mCommentsList =new ArrayList<>();
     Context mContext;
     String mInstCode;
     String mNoticeId;
@@ -62,7 +63,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                         switch (dc.getType()) {
                             case ADDED:
                                 String id = dc.getDocument().getId();
-                                Comment lComment = dc.getDocument().toObject(Comment.class).withId(id);
+                                Text lComment = dc.getDocument().toObject(Text.class).withId(id);
                                 mCommentsList.add(lComment);
                                 Log.d("Comment Display", lComment.getUsername());
                                 CommentAdapter.this.notifyDataSetChanged();
@@ -91,7 +92,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull CommentAdapter.CommentViewHolder holder, int position) {
-        Comment lComment=mCommentsList.get(position);
+        Text lComment=mCommentsList.get(position);
         holder.mUsernameTv.setText(lComment.getUsername());
         holder.mCommentTv.setText(lComment.getMessage());
 

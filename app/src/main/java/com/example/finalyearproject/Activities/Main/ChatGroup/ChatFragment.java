@@ -109,7 +109,7 @@ public class ChatFragment extends Fragment {
         chat.setMessage(text);
         chat.setUsername(FirebaseUtils.sFirebaseAuth.getCurrentUser().getDisplayName());
 //        Long tsLong = System.currentTimeMillis()/1000;
-        chat.setTimeStamp(FieldValue.serverTimestamp());
+        chat.addTimeStampToken(FieldValue.serverTimestamp());
         FirebaseUtils.addChat(mViewModel.getInstCode().getValue(),getActivity(),chat,mViewModel.getIdList().getValue().get(mViewModel.getIdList().getValue().size()-1));
 
     }

@@ -16,15 +16,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.finalyearproject.Activities.Launch.LaunchActivity;
-import com.example.finalyearproject.Activities.Main.ChatGroup.ChatAdapter;
 import com.example.finalyearproject.Activities.Main.MainActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.Comment;
 import com.example.finalyearproject.Modules.Notice;
 import com.example.finalyearproject.R;
 import com.google.firebase.firestore.FieldValue;
-
-import org.jetbrains.annotations.NotNull;
 
 public class OpenNoticeActivity extends AppCompatActivity {
 
@@ -120,7 +117,9 @@ public class OpenNoticeActivity extends AppCompatActivity {
         lComment.setMessage(text);
         lComment.setUsername(FirebaseUtils.sFirebaseAuth.getCurrentUser().getDisplayName());
 //        Long tsLong = System.currentTimeMillis()/1000;
-        lComment.setTimeStamp(FieldValue.serverTimestamp());
+//        Timestamp tm=FieldValue.serverTimestamp();
+        FieldValue ts=FieldValue.serverTimestamp();
+        lComment.addTimeStampToken(ts);
         FirebaseUtils.addComment(mInstCode,this,lComment,mNotice.getId());
 
     }
