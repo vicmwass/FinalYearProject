@@ -12,11 +12,14 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
-import com.example.finalyearproject.Modules.Comment;
 import com.example.finalyearproject.Modules.Text;
+import com.example.finalyearproject.Modules.User;
 import com.example.finalyearproject.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -29,6 +32,7 @@ import java.util.ArrayList;
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentViewHolder> {
 
     ArrayList<Text> mCommentsList =new ArrayList<>();
+    ArrayList<String> mUsernames =new ArrayList<>();
     Context mContext;
     String mInstCode;
     String mNoticeId;
@@ -65,18 +69,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
                                 String id = dc.getDocument().getId();
                                 Text lComment = dc.getDocument().toObject(Text.class).withId(id);
                                 mCommentsList.add(lComment);
-                                Log.d("Comment Display", lComment.getUsername());
                                 CommentAdapter.this.notifyDataSetChanged();
                                 int sz=getItemCount();
                                 mRecyclerView.scrollToPosition(sz-1);
                                 break;
                             case MODIFIED:
-                                break;
                             case REMOVED:
                                 break;
                         }
                     }
                 }
+
             }
         });
 
@@ -93,9 +96,18 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
     @Override
     public void onBindViewHolder(@NonNull @NotNull CommentAdapter.CommentViewHolder holder, int position) {
         Text lComment=mCommentsList.get(position);
-        holder.mUsernameTv.setText(lComment.getUsername());
+            FirebaseUtils.FIRESTORE.collection("users").document(lComment.getUserID())
+                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                    if(task.isSuccessful()){
+//                        mUsernames.add();
+                        holder.mUsernameTv.setText((String) task.getResult().get(User.USERNAME));
+                        Log.d("Comment user", (String) task.getResult().get(User.USERNAME));
+                    }
+                }
+            });
         holder.mCommentTv.setText(lComment.getMessage());
-
     }
 
     @Override

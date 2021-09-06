@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:id="@+id/toolbar">
+
+
+        <RelativeLayout
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:id="@+id/back_arrow">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/arrow_back_24"
+                android:layout_centerVertical="true"
+                android:id="@+id/image_back_arrow"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fragment_heading"
+            android:layout_toRightOf="@+id/back_arrow"
+            android:textSize="20sp"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="matrix"
+            android:alpha=".1"
+            android:id="@+id/background"/>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Top Half of Layout -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:padding="20dp">
+
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/camera_24"
+                    android:id="@+id/profile_image"
+                    android:layout_centerInParent="true"
+                    />
+
+
+            </RelativeLayout>
+
+
+            <!-- Bottom Half of Layout -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="50"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Name: "
+                        android:textSize="20sp"
+                        android:layout_gravity="center_vertical"/>
+
+                    <EditText
+                        android:id="@+id/user_edit_name"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:enabled="false"
+                        android:focusableInTouchMode="false"
+                        android:textSize="20sp" />
+                    <ImageView
+                        android:id="@+id/edit_name"
+                        android:layout_width="35dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/edit_24"
+                        android:layout_centerVertical="true"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Phone No: "
+                        android:textSize="20sp"
+                        android:layout_gravity="center_vertical"/>
+
+                    <EditText
+                        android:id="@+id/user_edit_phone"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:enabled="false"
+                        android:focusableInTouchMode="false"
+                        android:textSize="20sp" />
+                    <ImageView
+                        android:id="@+id/edit_phone"
+                        android:layout_width="35dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/edit_24"
+                        android:layout_centerVertical="true"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Email: "
+                        android:textSize="20sp"
+                        android:layout_gravity="center_vertical"/>
+
+                    <EditText
+                        android:id="@+id/user_edit_email"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:inputType="textEmailAddress"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:enabled="false"
+                        android:focusableInTouchMode="false"
+                        android:textSize="20sp" />
+                    <ImageView
+                        android:id="@+id/edit_email"
+                        android:layout_width="35dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/edit_24"
+                        android:layout_centerVertical="true"/>
+                </LinearLayout>
+
+
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="?attr/actionBarSize"-->
+<!--                    android:orientation="horizontal">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Status: "-->
+<!--                        android:textSize="20sp"-->
+<!--                        android:layout_gravity="center_vertical"/>-->
+<!--                    <EditText-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginLeft="5dp"-->
+<!--                        android:layout_gravity="center_vertical"-->
+<!--                        android:textSize="20sp"/>-->
+<!--                </LinearLayout>-->
+
+
+<!--                <RelativeLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="?attr/actionBarSize"-->
+<!--                    android:layout_marginTop="20dp">-->
+
+<!--                    <Button-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="save"-->
+<!--                        android:id="@+id/btn_save_profile"-->
+<!--                        android:layout_centerInParent="true"/>-->
+
+<!--                </RelativeLayout>-->
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</RelativeLayout>
+
+
+
+
+
+
+
+

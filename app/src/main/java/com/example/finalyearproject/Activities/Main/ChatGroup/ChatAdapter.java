@@ -15,12 +15,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.finalyearproject.Activities.Main.SharedViewModel;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
-import com.example.finalyearproject.Modules.ChatMessage;
 import com.example.finalyearproject.Modules.Text;
+import com.example.finalyearproject.Modules.User;
 import com.example.finalyearproject.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -39,6 +42,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     SharedViewModel mViewModel;
     private final RecyclerView mRecyclerView;
     public FirebaseAuth mFirebaseAuth;
+    private ArrayList<String> mUsernames;
 
     public ChatAdapter(Context context,SharedViewModel viewModel,RecyclerView recyclerView){
         mContext=context;
@@ -67,8 +71,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                                 String id = dc.getDocument().getId();
                                 Text lChatMessage = dc.getDocument().toObject(Text.class).withId(id);
                                 mChatList.add(lChatMessage);
-                                Log.d("Chat Display", lChatMessage.getUsername());
                                 ChatAdapter.this.notifyDataSetChanged();
+                                Log.d("Chat Display", lChatMessage.getUserID());
                                 int sz=getItemCount();
                                 mRecyclerView.scrollToPosition(sz-1);
                                 break;
@@ -78,6 +82,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
                                 break;
                         }
                     }
+
                 }
             }
         });
@@ -104,12 +109,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         Text chat=mChatList.get(position);
         holder.mText.setText(chat.getMessage());
         holder.mChatContainer.setGravity(Gravity.LEFT);
-        if(mFirebaseAuth.getCurrentUser().getDisplayName().equals(chat.getUsername())){
-            holder.mUsername.setText("you");
-            holder.mChatContainer.setGravity(Gravity.RIGHT);
-        }else {
-            holder.mUsername.setText(chat.getUsername());
-        }
+        FirebaseUtils.FIRESTORE.collection("users").document(chat.getUserID())
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    if(mFirebaseAuth.getCurrentUser().getDisplayName().equals(chat.getUserID())){
+                        holder.mUsername.setText("you");
+                        holder.mChatContainer.setGravity(Gravity.RIGHT);
+                    }else {
+                        holder.mUsername.setText((String) task.getResult().get(User.USERNAME));
+                    }
+                }
+            }
+        });
+
 
     }
     private Date getDate(long timeStamp){

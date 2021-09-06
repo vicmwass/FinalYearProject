@@ -143,11 +143,13 @@ public class RegisterForInstitutionActivity extends AppCompatActivity implements
             public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                     if(task.getResult().exists()){
                         Institution selectedInst=task.getResult().toObject(Institution.class);
-                        mInstUser.setUserId(mFirebaseAuth.getUid());
-                        mInstUser.setEmail(mFirebaseAuth.getCurrentUser().getEmail());
+//                        mInstUser.setUserId(mFirebaseAuth.getUid());
+//                        mInstUser.setEmail(mFirebaseAuth.getCurrentUser().getEmail());
                         mUser.setId(mFirebaseAuth.getUid());
                         mUser.addInstitution(mInstCode);
-                        FirebaseUtils.saveInstUserDetails(mInstCode,mInstUser);
+                        mUser.setUsername(mFirebaseAuth.getCurrentUser().getDisplayName());
+                        mUser.setEmail(mFirebaseAuth.getCurrentUser().getEmail());
+//                        FirebaseUtils.saveInstUserDetails(mInstCode,mInstUser);
                         FirebaseUtils.saveUserDetails(mUser);
                         Intent lIntent=new Intent(RegisterForInstitutionActivity.this, MainActivity.class);
                         lIntent.putExtra(INSTITUTION_DETAILS, (Parcelable) selectedInst);

@@ -1,22 +1,21 @@
 package com.example.finalyearproject.Modules;
 
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.FieldValue;
 
 public class Text {
-    private String username;
+    private String userID;
     private String message;
     private String id;
     private Timestamp timeStamp;
 
 
 
-    public String getUsername() {
-        return username;
+    public String getUserID() {
+        return userID;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
     public String getMessage() {

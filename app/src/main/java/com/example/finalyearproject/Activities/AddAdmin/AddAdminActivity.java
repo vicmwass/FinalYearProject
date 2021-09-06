@@ -91,7 +91,7 @@ public class AddAdminActivity extends AppCompatActivity {
     private void initializeViews() {
 //        mEtAdminName1 = findViewById(R.id.et_admin_name);
         mToolbar = findViewById(R.id.toolbar);
-        mSearchView = (androidx.appcompat.widget.SearchView)findViewById(R.id.action_search);
+        mSearchView = findViewById(R.id.action_search);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(mNavObjects.getInstDetails().getName());
         getSupportActionBar().setSubtitle(mDomainName);

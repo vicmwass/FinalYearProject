@@ -12,13 +12,23 @@ public class Institution implements Serializable, Parcelable {
     private String code;
     private String creator;
     private ArrayList<String> adminList=new ArrayList<String>();
+    private ArrayList<String> users=new ArrayList<String>();
     public Institution(){}
+
+    public ArrayList<String> getUsers() {
+        return users;
+    }
+
+    public void setUsers(ArrayList<String> users) {
+        this.users = users;
+    }
 
     protected Institution(Parcel in) {
         name = in.readString();
         code = in.readString();
         creator = in.readString();
         adminList = in.createStringArrayList();
+        users = in.createStringArrayList();
     }
 
     public static final Creator<Institution> CREATOR = new Creator<Institution>() {
@@ -81,6 +91,7 @@ public class Institution implements Serializable, Parcelable {
         dest.writeString(code);
         dest.writeString(creator);
         dest.writeStringList(adminList);
+        dest.writeStringList(users);
 
     }
 }

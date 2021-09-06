@@ -55,7 +55,6 @@ public class RegisterInstitutionActivity extends AppCompatActivity {
                     lIntent.putExtra(INSTITUTION_DETAILS, (Parcelable) mInst);
                     startActivity(lIntent);
                 }
-
             }
         });
 
@@ -70,13 +69,20 @@ public class RegisterInstitutionActivity extends AppCompatActivity {
         mInst.setName(lInstName);
         mInst.setCreator(mFirebaseAuth.getUid());
         mInst.setAdminList(new ArrayList<String>(Arrays.asList(mFirebaseAuth.getUid())));
+        mInst.setUsers(new ArrayList<String>(Arrays.asList(mFirebaseAuth.getUid())));
         generateCode(lInstName);
         FirebaseUtils.saveInstitution(this,mInst);
-        mInstUser.setUserId(mFirebaseAuth.getUid());
-        mInstUser.setEmail(mFirebaseAuth.getCurrentUser().getEmail());
+//        mInstUser.setUserId(mFirebaseAuth.getUid());
+//        mInstUser.setEmail(mFirebaseAuth.getCurrentUser().getEmail());
         mUser.setId(mFirebaseAuth.getUid());
         mUser.addInstitution(mInst.getCode());
-        FirebaseUtils.saveInstUserDetails(mInst.getCode(),mInstUser);
+        mUser.setUsername(mFirebaseAuth.getCurrentUser().getDisplayName());
+        mUser.setEmail(mFirebaseAuth.getCurrentUser().getEmail());
+
+
+
+//        FirebaseUtils.addUserToInst(mInst.getCode(),mFirebaseAuth.getUid());
+//        FirebaseUtils.saveInstUserDetails(mInst.getCode(),mInstUser);
         FirebaseUtils.saveUserDetails(mUser);
         return true;
     }
@@ -104,7 +110,5 @@ public class RegisterInstitutionActivity extends AppCompatActivity {
 //                        Log.e("Firestore", "Error updating document", e);
                     }
                 });
-
-
     }
 }

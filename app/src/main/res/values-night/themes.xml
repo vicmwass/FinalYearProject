@@ -13,4 +13,56 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
         <!-- Customize your theme here. -->
     </style>
+    <style name="Theme.FinalYearProject1" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#56E330</item>
+        <item name="colorPrimaryVariant">#056C13</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="Theme.FinalYearProject2" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_200</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="Theme.FinalYearProject3" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_200</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+        <!-- Customize your theme here. -->
+    </style>
+    <style name="Theme.FinalYearProject4" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_200</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimary</item>
+        <!-- Customize your theme here. -->
+    </style>
 </resources>

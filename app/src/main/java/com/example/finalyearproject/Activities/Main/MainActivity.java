@@ -26,11 +26,13 @@ import com.example.finalyearproject.Activities.AboutInstitution;
 import com.example.finalyearproject.Activities.AddAdmin.AddAdminActivity;
 import com.example.finalyearproject.Activities.AddDomain.AddDomainActivity;
 import com.example.finalyearproject.Activities.AddNoticeActivity;
+import com.example.finalyearproject.Activities.InstUsersActivity;
 import com.example.finalyearproject.Activities.Launch.LaunchActivity;
 import com.example.finalyearproject.Activities.ChooseIntitution.ChooseInstitutionActivity;
 import com.example.finalyearproject.Activities.Launch.RegisterForInstitutionActivity;
 import com.example.finalyearproject.Activities.Main.ChatGroup.ChatFragment;
 import com.example.finalyearproject.Activities.Main.Notices.NoticeListFragment;
+import com.example.finalyearproject.Activities.ProfileActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.Institution;
 import com.example.finalyearproject.Modules.NavObjects;
@@ -111,7 +113,6 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
         mViewPageAdapter = new ViewPageAdapter(getSupportFragmentManager(),0);
         mTabLayout.setupWithViewPager(mViewPager);
         mViewPager.setAdapter(mViewPageAdapter);
-
     }
 
      private void changefragment(int type ) {
@@ -123,9 +124,6 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
              newFragment = new NoticeListFragment();
              replaceFragment(newFragment,R.id.chat_fragment,"NOTICE_FRAGMENT","CHAT_FRAGMENT");
          }
-
-
-
          mViewPageAdapter.switchTitles(type);
 //         mViewPager.getAdapter().notifyDataSetChanged();
 
@@ -169,12 +167,12 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
     private void setupViewModel() {
         mViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
-
         String userId= FirebaseAuth.getInstance().getUid();
         if(mInstDetails.getAdminList().contains(userId)){
             mViewModel.setAdminLevel("Main");
             mViewModel.setDomainAdminList(new ArrayList<String>(Arrays.asList(userId)));
         }
+
         mViewModel.setInstCode(mInstCode);
         mViewModel.getIdList().observe(this, new Observer<ArrayList<String>>() {
             @Override
@@ -198,10 +196,8 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                         mViewModel.setIsChatGroup(false);
                     }
                 }
-
-
-
             }});
+
         mViewModel.getIsChatGroup().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
@@ -232,10 +228,7 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                 mDomainName=mDomainNameList.get(mDomainNameList.size()-1);
                 if(!mDomainName.equals("main"))
                 getSupportActionBar().setSubtitle(mDomainName);
-            }});
-
-
-
+         }});
 
         mViewModel.getPrivacyLevel().observe(this, new Observer<Integer>() {
             @Override
@@ -250,8 +243,7 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                         mIsAdmin =false;
                     }
                 }
-            }
-        });
+            }});
 
     }
 
@@ -305,7 +297,7 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
             case R.id.to_new_notice:
                 Intent NIntent =new Intent(this, AddNoticeActivity.class);
                 NIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
-                startActivity(NIntent);mInstDetails.getCode();
+                startActivity(NIntent);
                 break;
             case R.id.add_admin:
                 Intent AIntent =new Intent(this, AddAdminActivity.class);
@@ -320,6 +312,16 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                 startActivity(OIntent);
                 finish();
                 break;
+            case R.id.users_list:
+                Intent MIntent =new Intent(this, InstUsersActivity.class);
+                MIntent.putExtra(INSTITUTION_CODE,mInstCode);
+                startActivity(MIntent);
+                break;
+            case R.id.user_profile:
+                Intent PIntent =new Intent(this, ProfileActivity.class);
+                startActivity(PIntent);
+                break;
+
 
         }
         return super.onOptionsItemSelected(item);
@@ -353,10 +355,7 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                 mFinalExit =true;
                 Toast.makeText(this,"press again to exit",Toast.LENGTH_LONG).show();
             }
-
         }
-
-
     }
 
     private void savePrefData() {
@@ -418,7 +417,6 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                 activity.startActivity(AIIntent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
-
         }
     }
 
@@ -436,9 +434,7 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                             lIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
                             lIntent.putExtra(INSTITUTION_LIST,lInst);
                             activity.startActivity(lIntent);
-
                         }
-
                     }
                 });
 

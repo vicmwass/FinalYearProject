@@ -11,7 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalYearProject">
-        <activity android:name=".Activities.AboutInstitution"></activity>
+        <activity android:name=".Activities.ProfileActivity"></activity>
+        <activity android:name=".Activities.InstUsersActivity" />
+        <activity android:name=".Activities.AboutInstitution" />
         <activity android:name=".Activities.AddAdmin.AddAdminActivity" />
         <activity android:name=".Activities.ChooseIntitution.ChooseInstitutionActivity" />
         <activity android:name=".Activities.Launch.RegisterForInstitutionActivity" />

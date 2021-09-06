@@ -115,7 +115,7 @@ public class OpenNoticeActivity extends AppCompatActivity {
         mInputComment.setText("");
         Comment lComment=new Comment();
         lComment.setMessage(text);
-        lComment.setUsername(FirebaseUtils.sFirebaseAuth.getCurrentUser().getDisplayName());
+        lComment.setUserID(FirebaseUtils.sFirebaseAuth.getUid());
 //        Long tsLong = System.currentTimeMillis()/1000;
 //        Timestamp tm=FieldValue.serverTimestamp();
         FieldValue ts=FieldValue.serverTimestamp();

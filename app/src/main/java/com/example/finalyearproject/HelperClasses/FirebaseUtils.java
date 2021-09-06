@@ -129,6 +129,12 @@ public class FirebaseUtils {
         sFirebaseAuth.signOut();
     }
 
+    public static void addUserToInst(String Code,String userId){
+        FIRESTORE.collection(INSTITUTIONS).document(Code)
+                .update("users", FieldValue.arrayUnion(userId));
+
+    }
+
     private static void addUserInst(User user){
         for(String inst:user.getInstitutions()){
             FIRESTORE.collection(USERS)
@@ -204,7 +210,6 @@ public class FirebaseUtils {
                     Log.d("UserDetails", "No such document");
                     addUser(user);
                 }
-
             }
         });
 
@@ -313,6 +318,7 @@ public class FirebaseUtils {
             }
         });
     }
+
     public static void addComment(String instCode, Activity activity, Comment cmt, String noticeId){
         final DocumentReference commentRef;
         commentRef= FIRESTORE.collection(INSTITUTIONS).document(instCode).collection(COMMENTS)
@@ -324,18 +330,19 @@ public class FirebaseUtils {
                     @Override
                     public void onSuccess(Void unused) {
                         Toast.makeText(activity,"Added successful",Toast.LENGTH_LONG).show();
-                        Log.d("Firestore", "Document updated with sender: " + cmt.getUsername());
+                        Log.d("Firestore", "Document updated with sender: " + cmt.getUserID());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull  Exception e) {
                         Toast.makeText(activity,"Failed to add",Toast.LENGTH_LONG).show();
-                        Log.e("Firestore", "Failed to add notice with sender: " + cmt.getUsername() );
+                        Log.e("Firestore", "Failed to add notice with sender: " + cmt.getUserID() );
                     }
                 });
 
     }
+
     public static void addChat(String instCode, Activity activity, ChatMessage msg, String domainId){
         final DocumentReference chatRef;
         chatRef= FIRESTORE.collection(INSTITUTIONS).document(instCode).collection("chats")
@@ -347,14 +354,14 @@ public class FirebaseUtils {
                     @Override
                     public void onSuccess(Void unused) {
                         Toast.makeText(activity,"Added successful",Toast.LENGTH_LONG).show();
-                        Log.d("Firestore", "Document updated with sender: " + msg.getUsername());
+                        Log.d("Firestore", "Document updated with sender: " + msg.getUserID());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull  Exception e) {
                         Toast.makeText(activity,"Failed to add",Toast.LENGTH_LONG).show();
-                        Log.e("Firestore", "Failed to add notice with sender: " + msg.getUsername() );
+                        Log.e("Firestore", "Failed to add notice with sender: " + msg.getUserID() );
                     }
                 });
     }
