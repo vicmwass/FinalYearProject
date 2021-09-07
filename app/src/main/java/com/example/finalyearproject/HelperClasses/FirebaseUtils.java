@@ -379,14 +379,14 @@ public class FirebaseUtils {
                     public void onSuccess(Void unused) {
                         Toast.makeText(activity,"Added successful",Toast.LENGTH_LONG).show();
                         activity.finish();
-                        Log.d("Firestore", "Document updated with sender: " + notice.getSender());
+                        Log.d("Firestore", "Document updated with sender: " + notice.getSenderId());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull  Exception e) {
                         Toast.makeText(activity,"Failed to add",Toast.LENGTH_LONG).show();
-                        Log.e("Firestore", "Failed to add notice with sender: " + notice.getSender());
+                        Log.e("Firestore", "Failed to add notice with sender: " + notice.getSenderId());
                     }
                 });
 

@@ -56,7 +56,7 @@ public class OpenNoticeActivity extends AppCompatActivity {
         if(!mNotice.isCommentable()){
             mCommentSection.setVisibility(View.GONE);
         }
-        mTvSender.setText(mNotice.getSender());
+        mTvSender.setText(mNotice.getSenderId());
         mTvSubject.setText(mNotice.getSubject());
         if(mNotice.getDescription()!=null){
             mTvDescription.setText(mNotice.getDescription());

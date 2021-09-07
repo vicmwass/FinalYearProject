@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Notice implements Serializable {
 
-    private String sender;
+    private String senderId;
     private String subject;
     private String fileUrl;
     private String fileName;
@@ -30,12 +30,12 @@ public class Notice implements Serializable {
         return isCommentable;
     }
 
-    public String getSender() {
-        return sender;
+    public String getSenderId() {
+        return senderId;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
     }
 
     public String getSubject() {

@@ -151,6 +151,7 @@ public class RegisterForInstitutionActivity extends AppCompatActivity implements
                         mUser.setEmail(mFirebaseAuth.getCurrentUser().getEmail());
 //                        FirebaseUtils.saveInstUserDetails(mInstCode,mInstUser);
                         FirebaseUtils.saveUserDetails(mUser);
+                        FirebaseUtils.addUserToInst(mInstCode,mUser.getId());
                         Intent lIntent=new Intent(RegisterForInstitutionActivity.this, MainActivity.class);
                         lIntent.putExtra(INSTITUTION_DETAILS, (Parcelable) selectedInst);
                         startActivity(lIntent);

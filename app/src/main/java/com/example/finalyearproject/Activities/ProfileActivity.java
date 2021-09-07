@@ -306,7 +306,7 @@ public class ProfileActivity extends AppCompatActivity implements EmailDialog.Em
                                             DocumentReference  userRef = mFirestore.collection("users")
                                                     .document(mFirebaseAuth.getUid());
                                             userRef.update(
-                                                    "email", mEtName.getText().toString().trim()
+                                                    "email", mEtEmail.getText().toString().trim()
                                             ).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull @NotNull Task<Void> task) {

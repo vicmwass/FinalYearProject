@@ -91,6 +91,7 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
         mInstDetails = (Institution) lIntent.getParcelableExtra(INSTITUTION_DETAILS);
          mInstCode = mInstDetails.getCode();
 
+
         setupViewModel();
         setupNavigatioView();
         setupAdapter();
@@ -168,9 +169,10 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
         mViewModel = new ViewModelProvider(this).get(SharedViewModel.class);
 
         String userId= FirebaseAuth.getInstance().getUid();
+        mViewModel.setDomainAdminList(mInstDetails.getAdminList());
         if(mInstDetails.getAdminList().contains(userId)){
             mViewModel.setAdminLevel("Main");
-            mViewModel.setDomainAdminList(new ArrayList<String>(Arrays.asList(userId)));
+//            mViewModel.setDomainAdminList(new ArrayList<String>(Arrays.asList(userId)));
         }
 
         mViewModel.setInstCode(mInstCode);

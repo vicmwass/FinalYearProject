@@ -14,11 +14,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.finalyearproject.Activities.AddAdmin.AddAdminViewModel;
 import com.example.finalyearproject.Activities.AddAdmin.AdminAdapter;
+import com.example.finalyearproject.Activities.UserListAdapter;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.InstUser;
+import com.example.finalyearproject.Modules.User;
 import com.example.finalyearproject.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -29,7 +34,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MembersViewHolder> {
-    ArrayList<InstUser> mInstUserList=new ArrayList<InstUser>();
+    ArrayList<User> mInstUserList=new ArrayList<>();
     //    Activity mActivity;
 //    ArrayList<String> mInstNameList;
     AddDomainViewModel mViewModel;
@@ -45,35 +50,59 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MembersV
     }
 
     private void populateData() {
-        CollectionReference tempRef = FirebaseUtils.FIRESTORE.collection("Institutions").document(mInstCode).collection("Users");
-
-
-        tempRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        FirebaseUtils.FIRESTORE.collection(FirebaseUtils.INSTITUTIONS).document(mInstCode)
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                if (error != null) {
-                    Log.e("SnapshotListener", error.getMessage());
-                    return;
-                }
-                if(value.getDocumentChanges().size()>0) {
-                    for (DocumentChange dc : value.getDocumentChanges()) {
-                        switch (dc.getType()) {
-                            case ADDED:
-                                String id = dc.getDocument().getId();
-                                InstUser lInstUser = dc.getDocument().toObject(InstUser.class);
-                                mInstUserList.add(lInstUser);
-                                Log.d("DomainName", lInstUser.getEmail());
-                                MembersAdapter.this.notifyDataSetChanged();
-                                break;
-                            case MODIFIED:
-                                break;
-                            case REMOVED:
-                                break;
-                        }
+            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    ArrayList<String> mUsers = (ArrayList<String>) task.getResult().get("users");
+                    for (String userid: mUsers) {
+                        FirebaseUtils.FIRESTORE.collection("users").document(userid)
+                                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    User lUser=task.getResult().toObject(User.class).withId(task.getResult().getId());
+                                    mInstUserList.add(lUser);
+                                    MembersAdapter.this.notifyDataSetChanged();
+                                }
+                            }
+                        });
                     }
+
                 }
             }
         });
+
+//        CollectionReference tempRef = FirebaseUtils.FIRESTORE.collection("Institutions").document(mInstCode).collection("Users");
+//
+//
+//        tempRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+//                if (error != null) {
+//                    Log.e("SnapshotListener", error.getMessage());
+//                    return;
+//                }
+//                if(value.getDocumentChanges().size()>0) {
+//                    for (DocumentChange dc : value.getDocumentChanges()) {
+//                        switch (dc.getType()) {
+//                            case ADDED:
+//                                String id = dc.getDocument().getId();
+//                                InstUser lInstUser = dc.getDocument().toObject(InstUser.class);
+//                                mInstUserList.add(lInstUser);
+//                                Log.d("DomainName", lInstUser.getEmail());
+//                                MembersAdapter.this.notifyDataSetChanged();
+//                                break;
+//                            case MODIFIED:
+//                                break;
+//                            case REMOVED:
+//                                break;
+//                        }
+//                    }
+//                }
+//            }
+//        });
     }
 
     @NonNull
@@ -87,18 +116,17 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MembersV
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull MembersAdapter.MembersViewHolder holder, int position) {
-        InstUser lInstUser =mInstUserList.get(position);
+        User lInstUser =mInstUserList.get(position);
         holder.mTvName.setText(lInstUser.getEmail());
         holder.mRCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(holder.mCbUser.isChecked()){
                     holder.mCbUser.setChecked(false);
-                    mViewModel.removeMemberFromSet(lInstUser.getUserId());
+                    mViewModel.removeMemberFromSet(lInstUser.getId());
                 }else{
                     holder.mCbUser.setChecked(true);
-                    mViewModel.addMemberToSet(lInstUser.getUserId());
-
+                    mViewModel.addMemberToSet(lInstUser.getId());
                 }
             }
         });

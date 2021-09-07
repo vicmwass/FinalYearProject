@@ -25,6 +25,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.finalyearproject.Activities.Main.MainActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
@@ -38,6 +39,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -47,6 +49,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 import static com.example.finalyearproject.Activities.Main.MainActivity.NAV_OBJECT;
+import static com.example.finalyearproject.HelperClasses.FirebaseUtils.FIRESTORE;
+import static com.example.finalyearproject.HelperClasses.FirebaseUtils.INSTITUTIONS;
 
 public class AddNoticeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -158,7 +162,7 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
     }
 
 
-    private Boolean saveDetails(){
+    private Boolean checkDetails(){
         mNotice=new Notice();
         String lSubject=mEtSubject.getText().toString().trim();
         String lDescription=mDescription.getText().toString().trim();
@@ -177,7 +181,7 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
 
         }
         mNotice.setDomainName(mDomainName);
-        mNotice.setSender(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        mNotice.setSenderId(FirebaseAuth.getInstance().getUid());
         mNotice.setSubject(lSubject);
         mNotice.setFileName(mTvUpload.getText().toString());
 
@@ -195,7 +199,6 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
             String lFileName=queryName(getContentResolver(),mFileUri);
             mTvUpload.setText(lFileName);
             mNotice.setFileName(lFileName);
-            saveNoticeFile();
         }
     }
     private String queryName(ContentResolver resolver, Uri uri) {
@@ -210,8 +213,33 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
     }
 
     public  void saveNoticeFile(){
+
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater lInflater=getMenuInflater();
+        lInflater.inflate(R.menu.new_notice,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.save_notice:
+                if(checkDetails()){
+                    saveNotice();
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public  void saveNotice(){
+        if(!mNotice.getFileName().equals("")){
         final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setTitle("File is being uploaded");
+        progressDialog.setTitle("Uploading File");
         progressDialog.show();
         FirebaseUtils.sFirebaseStorage = FirebaseStorage.getInstance();
         FirebaseUtils.sStorageReference =FirebaseUtils.sFirebaseStorage.getReference().child("notice_files");
@@ -233,6 +261,7 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
                     String downloadUrl = task.getResult().toString();
                     mNotice.setFileUrl(downloadUrl);
                     progressDialog.dismiss();
+                    saveNoticeToFirebase();
                 } else {
                     Log.e("ImageUri", "Upload task unsuccessful");
                 }
@@ -243,31 +272,41 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
                 Log.e("ImageUri", "Upload failed "+e.getMessage());
             }
         });
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater lInflater=getMenuInflater();
-        lInflater.inflate(R.menu.new_notice,menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.save_notice:
-                String lId;
-                if(mIdList.size()>0)
-                    lId=mIdList.get(mIdList.size()-1);
-                else
-                    lId="0";
-                if(saveDetails()){
-                    FirebaseUtils.saveNotice(mInstCode,this,mNotice,lId);
-                }
-                break;
+        }else {
+            saveNoticeToFirebase();
         }
-        return super.onOptionsItemSelected(item);
+
+
+
+
+    }
+
+    public void saveNoticeToFirebase() {
+        String lId;
+        if(mIdList.size()>0)
+            lId=mIdList.get(mIdList.size()-1);
+        else
+            lId="0";
+        final DocumentReference noticeRef;
+        noticeRef= FIRESTORE.collection(INSTITUTIONS).document(mInstCode).collection("notices")
+                .document(lId)
+                .collection("my_notices")
+                .document();
+        noticeRef.set(mNotice)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(AddNoticeActivity.this,"Added successful",Toast.LENGTH_LONG).show();
+                            AddNoticeActivity.this.finish();
+                            Log.d("Firestore", "Document updated with sender: " + mNotice.getSenderId());
+                        }else {
+                            Toast.makeText(AddNoticeActivity.this,"Failed to add",Toast.LENGTH_LONG).show();
+                            Log.e("Firestore", "Failed to add notice with sender: " + mNotice.getSenderId());
+                        }
+
+                    }
+                });
     }
 
     @Override

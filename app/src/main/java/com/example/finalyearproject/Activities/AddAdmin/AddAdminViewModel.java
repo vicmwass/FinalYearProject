@@ -61,7 +61,7 @@ public class AddAdminViewModel extends ViewModel {
 
     public MutableLiveData<ArrayList<String>> getAdminIdList(){
         HashSet<String> tempSet= adminIdSet.getValue();
-        ArrayList<String> tempList=this.adminIdList.getValue();
+        ArrayList<String> tempList=new ArrayList<>();
         tempList.addAll(tempSet);
         this.adminIdList.setValue(tempList);
         return adminIdList;

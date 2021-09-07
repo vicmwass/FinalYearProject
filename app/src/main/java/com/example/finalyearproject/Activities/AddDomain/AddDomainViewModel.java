@@ -31,7 +31,7 @@ public class AddDomainViewModel extends AddAdminViewModel {
     }
     public MutableLiveData<ArrayList<String>> getMembersIdList(){
         HashSet<String> tempSet= membersIdSet.getValue();
-        ArrayList<String> tempList=this.membersIdList.getValue();
+        ArrayList<String> tempList=new ArrayList<>();
         tempList.addAll(tempSet);
         this.membersIdList.setValue(tempList);
         return membersIdList;

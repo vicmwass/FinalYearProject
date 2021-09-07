@@ -65,9 +65,11 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
         getIntentExtras();
         mViewModel = new ViewModelProvider(this).get(AddDomainViewModel.class);
         mViewModel.setCurrentAdminSet(mAdminList);
+
         if(mMemberList.size()>0){
             mViewModel.setMembersOfPrivateDomain(mMemberList);
         }
+
         initializeViews();
         setupNavigatioView();
         mDomain = new Domain();
@@ -82,7 +84,6 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
         mDomainName= mNavObjects.getDomainName();
         mAdminList = mNavObjects.getCurrentAdminList();
         mMemberList = mNavObjects.getMemberList();
-
     }
 
     private void initializeViews() {
@@ -107,20 +108,18 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
             public void onClick(View v) {
                 if(cbIsPrivate.isChecked()){
                     isPrivate=true;
+                    mViewModel.clearAdminSet();
                     mAdminAdapter.includeMembersOnly(mViewModel);
-                }
-                else {
-                    mAdminAdapter.includeAllPotentialAdmins();
+                }else{
                     isPrivate=false;
+                    mViewModel.clearAdminSet();
+                    mAdminAdapter.includeAllPotentialAdmins();
                 }
                 lLinearLayout.setVisibility(isPrivate?View.VISIBLE:View.GONE);
             }
         });
 
         mGroupCategory = findViewById(R.id.categories);
-
-
-
 
     }
 
@@ -154,9 +153,6 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
         }else {
             mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,false);
         }
-
-
-
     }
 
     @Override
@@ -172,25 +168,24 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
             mEtDomainName1.requestFocus();
             return false;
         }
-        if(mViewModel.getAdminIdList().getValue().size()<1){
-            Toast.makeText(this,"Must Have At Least One Admin",Toast.LENGTH_LONG).show();
-            return false;
-        }
+
         if(isPrivate){
             if(mViewModel.getMembersIdList().getValue().size()<1){
                 Toast.makeText(this,"Must Have At Least One Member",Toast.LENGTH_LONG).show();
                 return false;
             }
+            if(mViewModel.getAdminIdList().getValue().size()<1){
+                Toast.makeText(this,"Must Have At Least One Admin",Toast.LENGTH_LONG).show();
+                return false;
+            }
+
             mDomain.setPrivate(true);
             mDomain.setMemberList(mViewModel.getMembersIdList().getValue());
         }
         switch (mRadioGroup.getCheckedRadioButtonId()) {
             case R.id.chatGroup_rb:
                 mDomain.setChatGroup(true);
-
         }
-
-
         mDomain.setName(name);
         mDomain.setAdminList(mViewModel.getAdminIdList().getValue());
         return true;
@@ -203,7 +198,8 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
             case R.id.save_domain:
                 if(saveDetails()){
                     FirebaseUtils.saveDomain(mInstCode,mDomain,this,mIdList);
-                    finish();
+                    onBackPressed();
+//                    finish();
                 }
                 break;
         }

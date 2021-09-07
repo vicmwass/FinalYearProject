@@ -3,6 +3,7 @@ package com.example.finalyearproject.Activities.Main.Notices;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +21,19 @@ import com.example.finalyearproject.Activities.Main.SharedViewModel;
 import com.example.finalyearproject.Activities.OpenNoticeActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.Notice;
+import com.example.finalyearproject.Modules.User;
 import com.example.finalyearproject.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -35,6 +43,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
     Context mContext;
     private CollectionReference mNoticeRef;
     SharedViewModel mViewModel;
+    public final FirebaseAuth mFirebaseAuth=FirebaseAuth.getInstance();
 
     public NoticeAdapter(Context context, SharedViewModel viewModel){
         mContext=context;
@@ -67,7 +76,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
                                 String id = dc.getDocument().getId();
                                 Notice lNotice = dc.getDocument().toObject(Notice.class).withId(id);
                                 mNoticeList.add(lNotice);
-                                Log.d("NoticeSender", lNotice.getSender());
+                                Log.d("NoticeSender", lNotice.getSenderId());
                                 NoticeAdapter.this.notifyDataSetChanged();
                                 break;
                             case MODIFIED:
@@ -98,7 +107,15 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
     @Override
     public void onBindViewHolder(@NonNull NoticeAdapter.NoticeViewHolder holder, int position) {
         Notice lNotice = mNoticeList.get(position);
-        holder.tvSender.setText(lNotice.getSender());
+        FirebaseUtils.FIRESTORE.collection("users").document(lNotice.getSenderId())
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                        holder.tvSender.setText((String) task.getResult().get(User.USERNAME));
+                }
+            }
+        });
         holder.tvSubject.setText(lNotice.getSubject());
         holder.rlCard.setOnClickListener(new View.OnClickListener() {
             @Override

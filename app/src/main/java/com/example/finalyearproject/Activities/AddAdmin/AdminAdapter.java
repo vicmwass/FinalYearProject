@@ -64,11 +64,9 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
         mCurrentAdmins = mViewModel.getCurrentAdminSet().getValue();
         mMembersOfPrivateDomain = mViewModel.getMembersOfPrivateDomain().getValue();
         populateData();
-
     }
 
     public void includeAllPotentialAdmins() {
-        mViewModel.clearAdminSet();
         mInstUserList.clear();
         mInstUserPreFilterList.clear();
         for (User lUser:mAllInstUserList){
@@ -111,10 +109,9 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
                 }
             }
         });
-
     }
+
     public void includeMembersOnly(AddDomainViewModel domainViewModel){
-        mViewModel.clearAdminSet();
         domainViewModel.getMembersIdSet().observe((LifecycleOwner) mActivity, new Observer<HashSet<String>>() {
             @Override
             public void onChanged(HashSet<String> strings) {
@@ -163,7 +160,6 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
                 }else{
                     holder.mCbUser.setChecked(true);
                     mViewModel.addAdminToSet(lInstUser.getId());
-
                 }
             }
         });
