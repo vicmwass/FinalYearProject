@@ -1,5 +1,7 @@
 package com.example.finalyearproject.Activities.Main.SubDomains;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +9,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -88,6 +91,23 @@ public class DomainListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable  Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        SearchView mSearchView = getView().findViewById(R.id.action_search2);
+        mSearchView.setSearchableInfo(searchManager
+                .getSearchableInfo(getActivity().getComponentName()));
+        mSearchView.setMaxWidth(Integer.MAX_VALUE);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mDomainsAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
 
     }
 

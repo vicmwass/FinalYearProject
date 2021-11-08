@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/contact_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/gmail_img"
+            android:layout_width="85dp"
+            android:layout_height="match_parent"
+            android:src="@mipmap/gmail_icon_foreground" />
+    <TextView
+        android:id="@+id/user_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Email User"
+        android:layout_margin="@dimen/edit_text_margin"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/contact_whatsapp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/contact_email">
+
+        <ImageView
+            android:id="@+id/whatsapp_img"
+            android:layout_width="79dp"
+            android:layout_height="44dp"
+            android:layout_below="@+id/gmail_img"
+            android:layout_margin="5dp"
+            android:src="@mipmap/whatsapp_icon_foreground" />
+    <TextView
+        android:id="@+id/user_whatsapp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Whatsapp User"
+        android:layout_margin="@dimen/edit_text_margin"
+        />
+
+    </LinearLayout>
+<!--    <LinearLayout-->
+<!--        android:id="@+id/contact_sms"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@+id/contact_whatsapp">-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/sms_img"-->
+<!--            android:layout_width="79dp"-->
+<!--            android:layout_height="44dp"-->
+<!--            android:layout_below="@+id/gmail_img"-->
+<!--            android:layout_margin="5dp"-->
+<!--            android:src="@mipmap/ic_sms_foreground" />-->
+<!--        <TextView-->
+<!--            android:id="@+id/user_sms"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Sms User"-->
+<!--            android:layout_margin="@dimen/edit_text_margin"-->
+<!--            />-->
+
+<!--    </LinearLayout>-->
+    <LinearLayout
+        android:id="@+id/contact_call"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/contact_whatsapp">
+
+        <ImageView
+            android:id="@+id/whatsapp_call"
+            android:layout_width="79dp"
+            android:layout_height="44dp"
+            android:layout_below="@+id/gmail_img"
+            android:layout_margin="5dp"
+            android:src="@mipmap/ic_call_foreground" />
+        <TextView
+            android:id="@+id/user_call"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Call User"
+            android:layout_margin="@dimen/edit_text_margin"
+            />
+
+    </LinearLayout>
+</RelativeLayout>

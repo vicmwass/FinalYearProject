@@ -13,15 +13,17 @@ public class NavObjects implements Serializable,Parcelable {
     ArrayList<String> mCurrentAdminList;
     ArrayList<String> mMemberList;
     Boolean mIsAdmin;
+    int mPrivacyLevel;
 
 
-    public NavObjects(ArrayList<String> idList, Institution instDetails, String domainName, ArrayList<String> currentAdminList, ArrayList<String> memberList,boolean isAdmin) {
+    public NavObjects(ArrayList<String> idList, Institution instDetails, String domainName, ArrayList<String> currentAdminList, ArrayList<String> memberList,boolean isAdmin,int privacyLevel) {
         mIdList = idList;
         mInstDetails = instDetails;
         mDomainName = domainName;
         mCurrentAdminList = currentAdminList;
         mMemberList=memberList;
         mIsAdmin=isAdmin;
+        mPrivacyLevel=privacyLevel;
     }
 
 
@@ -32,6 +34,7 @@ public class NavObjects implements Serializable,Parcelable {
         mMemberList = in.createStringArrayList();
         mInstDetails = (Institution) in.readParcelable(Institution.class.getClassLoader());
         mIsAdmin=in.readByte()!=0;
+        mPrivacyLevel=in.readInt();
     }
 
     public static final Creator<NavObjects> CREATOR = new Creator<NavObjects>() {
@@ -86,6 +89,14 @@ public class NavObjects implements Serializable,Parcelable {
         mCurrentAdminList = currentAdminList;
     }
 
+    public int getPrivacyLevel() {
+        return mPrivacyLevel;
+    }
+
+    public void setPrivacyLevel(int privacyLevel) {
+        mPrivacyLevel = privacyLevel;
+    }
+
     public ArrayList<String> getMemberList() {
         return mMemberList;
     }
@@ -107,6 +118,7 @@ public class NavObjects implements Serializable,Parcelable {
         dest.writeStringList(mMemberList);
         dest.writeParcelable(mInstDetails,flags);
         dest.writeByte((byte) (mIsAdmin?1:0));
+        dest.writeInt(mPrivacyLevel);
 
     }
 }

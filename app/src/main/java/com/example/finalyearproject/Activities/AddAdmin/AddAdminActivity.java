@@ -21,11 +21,10 @@ import com.example.finalyearproject.Activities.Main.MainActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.NavObjects;
 import com.example.finalyearproject.R;
+import com.google.firebase.firestore.CollectionReference;
 
 import java.util.ArrayList;
 
-import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_CODE;
-import static com.example.finalyearproject.Activities.Main.MainActivity.DNAME;
 import static com.example.finalyearproject.Activities.Main.MainActivity.NAV_OBJECT;
 
 
@@ -43,16 +42,23 @@ public class AddAdminActivity extends AppCompatActivity {
     private NavObjects mNavObjects;
     private AdminAdapter mAdminAdapter;
     private SearchView mSearchView;
+    private CollectionReference mDomainsRef;
+    private int mPrivacyLevel;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MainActivity.changeTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_admin);
         getIntentExtras();
         initializeViews();
 
 
+
+    }
+
+    private void setupViewModel() {
         mViewModel = new ViewModelProvider(this).get(AddAdminViewModel.class);
         mViewModel.setCurrentAdminSet(mAdminList);
         if(mMemberList.size()>0)mViewModel.setMembersOfPrivateDomain(mMemberList);
@@ -65,8 +71,12 @@ public class AddAdminActivity extends AppCompatActivity {
         mIdList = mNavObjects.getIdList();
         mInstCode = mNavObjects.getInstDetails().getCode();
         mDomainName= mNavObjects.getDomainName();
-        mAdminList = mNavObjects.getCurrentAdminList();
-        mMemberList = mNavObjects.getMemberList();
+        mAdminList=mNavObjects.getCurrentAdminList();
+        mPrivacyLevel=mNavObjects.getPrivacyLevel();
+        mMemberList=mNavObjects.getMemberList();
+        setupViewModel();
+//        getMemberList();
+
     }
 
     private void setupAdapter() {
@@ -93,8 +103,13 @@ public class AddAdminActivity extends AppCompatActivity {
         mToolbar = findViewById(R.id.toolbar);
         mSearchView = findViewById(R.id.action_search);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(mNavObjects.getInstDetails().getName());
-        getSupportActionBar().setSubtitle(mDomainName);
+        getSupportActionBar().setTitle(mDomainName);
+        getSupportActionBar().setSubtitle("Add Admin");
+
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
@@ -128,6 +143,10 @@ public class AddAdminActivity extends AppCompatActivity {
             case R.id.save_admin:
                     ArrayList<String> adminList=mViewModel.getAdminIdList().getValue();
                     FirebaseUtils.addDomainAdmin(this,mInstCode,mIdList,adminList);
+                    break;
+            case android.R.id.home:
+                finish();
+                break;
 
         }
         return super.onOptionsItemSelected(item);

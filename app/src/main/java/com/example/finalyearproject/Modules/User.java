@@ -1,8 +1,11 @@
 package com.example.finalyearproject.Modules;
 
+import android.net.Uri;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class User {
+public class User implements Serializable {
     public static final String USERNAME="username";
 
     private String id;
@@ -10,6 +13,7 @@ public class User {
     private String phoneNo;
     private String email;
     private ArrayList<String> institutions=new ArrayList<String>();
+    private String imgUri;
 
     public String getUsername() {
         return username;
@@ -47,6 +51,13 @@ public class User {
         return institutions;
     }
 
+    public String getImgUri() {
+        return imgUri;
+    }
+
+    public void setImgUri(String imgUri) {
+        this.imgUri = imgUri;
+    }
 
     public void setInstitutions(ArrayList<String> institutions) {
         this.institutions = institutions;

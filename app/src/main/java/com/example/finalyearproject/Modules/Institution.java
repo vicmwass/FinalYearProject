@@ -13,6 +13,9 @@ public class Institution implements Serializable, Parcelable {
     private String creator;
     private ArrayList<String> adminList=new ArrayList<String>();
     private ArrayList<String> users=new ArrayList<String>();
+    private String theme;
+    private String description;
+    private String logoUri;
     public Institution(){}
 
     public ArrayList<String> getUsers() {
@@ -29,6 +32,9 @@ public class Institution implements Serializable, Parcelable {
         creator = in.readString();
         adminList = in.createStringArrayList();
         users = in.createStringArrayList();
+        theme=in.readString();
+        description=in.readString();
+        logoUri=in.readString();
     }
 
     public static final Creator<Institution> CREATOR = new Creator<Institution>() {
@@ -59,6 +65,13 @@ public class Institution implements Serializable, Parcelable {
         this.code = code;
     }
 
+    public String getTheme() {
+        return theme;
+    }
+
+    public void setTheme(String theme) {
+        this.theme = theme;
+    }
 
     public String getCreator() {
         return creator;
@@ -79,6 +92,21 @@ public class Institution implements Serializable, Parcelable {
         this.adminList.add(admin);
     }
 
+    public String getLogoUri() {
+        return logoUri;
+    }
+
+    public void setLogoUri(String logoUri) {
+        this.logoUri = logoUri;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     @Override
     public int describeContents() {
@@ -92,6 +120,9 @@ public class Institution implements Serializable, Parcelable {
         dest.writeString(creator);
         dest.writeStringList(adminList);
         dest.writeStringList(users);
+        dest.writeString(theme);
+        dest.writeString(description);
+        dest.writeString(logoUri);
 
     }
 }

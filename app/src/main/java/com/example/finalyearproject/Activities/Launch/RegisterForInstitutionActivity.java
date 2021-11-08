@@ -1,12 +1,12 @@
 package com.example.finalyearproject.Activities.Launch;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.MenuItem;
@@ -30,14 +30,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
-import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_CODE;
 import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
 import static com.example.finalyearproject.Activities.Main.MainActivity.NAV_OBJECT;
+import static com.example.finalyearproject.Activities.Main.MainActivity.SHARED_PREFS;
+import static com.example.finalyearproject.Activities.SplashScreen.APP_THEME;
 
-public class RegisterForInstitutionActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class RegisterForInstitutionActivity extends AppCompatActivity{
 
 
     private EditText mEtInstCode;
@@ -53,6 +51,7 @@ public class RegisterForInstitutionActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MainActivity.changeTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_for_institution);
 
@@ -60,9 +59,6 @@ public class RegisterForInstitutionActivity extends AppCompatActivity implements
         Intent lIntent=getIntent();
         mNavObjects = (NavObjects) lIntent.getParcelableExtra(NAV_OBJECT);
         initializeViews();
-        if(mNavObjects!=null){
-            setupNavigatioView();
-        }else hideNavigationView();
 
         mUser = new User();
         mInstUser = new InstUser();
@@ -88,42 +84,13 @@ public class RegisterForInstitutionActivity extends AppCompatActivity implements
             getSupportActionBar().setTitle(mNavObjects.getInstDetails().getName());
             getSupportActionBar().setSubtitle(mNavObjects.getDomainName());
         }
-
-        mDrawerLayout =findViewById(R.id.drawer_layout);
-        mNavigationView =findViewById(R.id.nav_view);
-    }
-
-    private void hideNavigationView() {
-        mToolbar.setVisibility(View.GONE);
-        mDrawerLayout.removeView(mNavigationView);
-//        mNavigationView.setVisibility(View.INVISIBLE);
-    }
-
-    private void setupNavigatioView() {
-        mToolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(R.string.app_name);
-
-        mDrawerLayout =findViewById(R.id.drawer_layout);
-        mNavigationView =findViewById(R.id.nav_view);
-
-
-        mNavigationView.bringToFront();//when navdrawer items clicked show that color to represent click
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
-        mDrawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-        //to make navigation drawer clickable
-        mNavigationView.setNavigationItemSelectedListener(this);
-
-        mNavigationView.setCheckedItem(R.id.choose_institution);
-
-        if(mNavObjects.getIsAdmin()){
-            mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,true);
-        }else {
-            mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,false);
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
+
     }
+
 
     private Boolean saveDetails() {
         mInstCode = mEtInstCode.getText().toString().trim();
@@ -145,6 +112,7 @@ public class RegisterForInstitutionActivity extends AppCompatActivity implements
                         Institution selectedInst=task.getResult().toObject(Institution.class);
 //                        mInstUser.setUserId(mFirebaseAuth.getUid());
 //                        mInstUser.setEmail(mFirebaseAuth.getCurrentUser().getEmail());
+                        savePrefData(selectedInst.getTheme());
                         mUser.setId(mFirebaseAuth.getUid());
                         mUser.addInstitution(mInstCode);
                         mUser.setUsername(mFirebaseAuth.getCurrentUser().getDisplayName());
@@ -165,10 +133,20 @@ public class RegisterForInstitutionActivity extends AppCompatActivity implements
         });
     }
 
-
     @Override
-    public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
-        MainActivity.navigationSwitch(this,item,mNavObjects, mDrawerLayout);
-        return true;
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+
+        return super.onOptionsItemSelected(item);
     }
+    private void savePrefData(String theme) {
+        SharedPreferences lSharedPreferences=getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+        SharedPreferences.Editor lEditor=lSharedPreferences.edit();
+        lEditor.putString(APP_THEME,theme);
+        lEditor.apply();
+    }
+
 }

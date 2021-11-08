@@ -1,7 +1,6 @@
 package com.example.finalyearproject.Activities.AddDomain;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -28,6 +27,7 @@ import com.example.finalyearproject.Modules.Domain;
 import com.example.finalyearproject.Modules.NavObjects;
 import com.example.finalyearproject.R;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.CollectionReference;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -56,24 +56,31 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
     private NavObjects mNavObjects;
     private RadioGroup mGroupCategory;
     private RadioGroup mRadioGroup;
+    private CollectionReference mDomainsRef;
+    private int mPrivacyLevel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MainActivity.changeTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_domain);
 
         getIntentExtras();
+
+
+        initializeViews();
+        mDomain = new Domain();
+
+    }
+
+    private void setupViewModel() {
         mViewModel = new ViewModelProvider(this).get(AddDomainViewModel.class);
         mViewModel.setCurrentAdminSet(mAdminList);
 
         if(mMemberList.size()>0){
             mViewModel.setMembersOfPrivateDomain(mMemberList);
         }
-
-        initializeViews();
-        setupNavigatioView();
-        mDomain = new Domain();
-
+        setupAdapters();
     }
 
     private void getIntentExtras() {
@@ -82,19 +89,28 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
         mIdList = mNavObjects.getIdList();
         mInstCode =  mNavObjects.getInstDetails().getCode();
         mDomainName= mNavObjects.getDomainName();
-        mAdminList = mNavObjects.getCurrentAdminList();
-        mMemberList = mNavObjects.getMemberList();
+        mAdminList=mNavObjects.getCurrentAdminList();
+        mMemberList=mNavObjects.getMemberList();
+        setupViewModel();
+//        mPrivacyLevel=mNavObjects.getPrivacyLevel();
+//        getMemberList();
     }
 
+
     private void initializeViews() {
-        setupAdapters();
+
         mEtDomainName1 = findViewById(R.id.et_domain_name);
         mRadioGroup = findViewById(R.id.categories);
         mToolbar = findViewById(R.id.toolbar);
         mNavigationView =findViewById(R.id.nav_view);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(mNavObjects.getInstDetails().getName());
-        getSupportActionBar().setSubtitle(mDomainName);
+        getSupportActionBar().setTitle(mDomainName);
+        getSupportActionBar().setSubtitle("Add Domain");
+
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
 //        TextView selectAdmin=findViewById(R.id.select_text_admins);
 //        selectAdmin.setVisibility(mMemberList.size()<=mAdminList.size()?View.sGONE:View.VISIBLE);
@@ -118,9 +134,7 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
                 lLinearLayout.setVisibility(isPrivate?View.VISIBLE:View.GONE);
             }
         });
-
         mGroupCategory = findViewById(R.id.categories);
-
     }
 
     private void setupAdapters() {
@@ -128,7 +142,7 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
         RecyclerView adminRecyclerview=findViewById(R.id.admin_recycler_view2);
         adminRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         adminRecyclerview.setAdapter(mAdminAdapter);
-        MembersAdapter lMembersAdapter = new MembersAdapter(mInstCode,mViewModel);
+        MembersAdapter lMembersAdapter = new MembersAdapter(this,mInstCode,mViewModel);
         RecyclerView membersRecyclerview=findViewById(R.id.members_recycler_view);
         membersRecyclerview.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         membersRecyclerview.setAdapter(lMembersAdapter);
@@ -137,23 +151,10 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
     @Override
     protected void onResume() {
         super.onResume();
-        mNavigationView.setCheckedItem(R.id.to_new_domains);
+//        mNavigationView.setCheckedItem(R.id.to_new_domains);
     }
 
-    private void setupNavigatioView() {
-        mNavigationView.bringToFront();//when navdrawer items clicked show that color to represent click
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
-        mDrawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-        //to make navigation drawer clickable
-        mNavigationView.setNavigationItemSelectedListener(this);
 
-        if(mNavObjects.getIsAdmin()){
-            mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,true);
-        }else {
-            mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,false);
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -182,6 +183,7 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
             mDomain.setPrivate(true);
             mDomain.setMemberList(mViewModel.getMembersIdList().getValue());
         }
+
         switch (mRadioGroup.getCheckedRadioButtonId()) {
             case R.id.chatGroup_rb:
                 mDomain.setChatGroup(true);
@@ -202,6 +204,10 @@ public class AddDomainActivity extends AppCompatActivity implements NavigationVi
 //                    finish();
                 }
                 break;
+            case android.R.id.home:
+                finish();
+                break;
+
         }
         return super.onOptionsItemSelected(item);
     }

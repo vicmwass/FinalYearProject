@@ -110,8 +110,6 @@ public class FirebaseUtils {
         // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build()
-                ,
-                new AuthUI.IdpConfig.GoogleBuilder().build()
         );
 
 
@@ -254,26 +252,7 @@ public class FirebaseUtils {
     }
 
 
-    public static void saveInstitution(Context context, Institution institution){
-        final DocumentReference institutionRef= FIRESTORE.collection(INSTITUTIONS).document(institution.getCode());
-        institutionRef.set(institution)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(context,"Added successful",Toast.LENGTH_LONG).show();
-//                        Log.d("Firestore", "Document updated with ID: " + PatientPostRef.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(context,"Failed to add",Toast.LENGTH_LONG).show();
-//                        Log.e("Firestore", "Error updating document", e);
-                    }
-                });
 
-
-    }
 
 
     public static void saveDomain(String instCode, Domain domain, Context context, ArrayList<String> idList){
@@ -353,14 +332,14 @@ public class FirebaseUtils {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(activity,"Added successful",Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity,"sent",Toast.LENGTH_LONG).show();
                         Log.d("Firestore", "Document updated with sender: " + msg.getUserID());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull  Exception e) {
-                        Toast.makeText(activity,"Failed to add",Toast.LENGTH_LONG).show();
+                        Toast.makeText(activity,"failed to send",Toast.LENGTH_LONG).show();
                         Log.e("Firestore", "Failed to add notice with sender: " + msg.getUserID() );
                     }
                 });

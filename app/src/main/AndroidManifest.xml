@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.finalyearproject">
 
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -11,30 +14,40 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalYearProject">
-        <activity android:name=".Activities.ProfileActivity"></activity>
-        <activity android:name=".Activities.InstUsersActivity" />
-        <activity android:name=".Activities.AboutInstitution" />
-        <activity android:name=".Activities.AddAdmin.AddAdminActivity" />
-        <activity android:name=".Activities.ChooseIntitution.ChooseInstitutionActivity" />
-        <activity android:name=".Activities.Launch.RegisterForInstitutionActivity" />
-        <activity android:name=".Activities.Launch.RegisterInstitutionActivity" />
-        <activity android:name=".Activities.Launch.LaunchActivity">
+        <activity android:name=".Activities.ReportActivity"></activity>
+        <activity android:name=".Activities.SettingsActivity" />
+        <activity android:name=".Activities.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.OpenNoticeActivity" />
+        <activity android:name=".Activities.RemoveUsersFromPrivateDomain.RemoveUserFromPrivateDomainActivity" />
+        <activity android:name=".Activities.ViewUsers.ListAdmins.ViewAdminsActivity" />
+        <activity android:name=".Activities.AddUsersToPrivateDomain.AddUsersToPrivateDomainActivity" />
+        <activity android:name=".Activities.Profile.ProfileActivity" />
+        <activity android:name=".Activities.ViewUsers.ListAllUsers.UsersListActivity" />
+        <activity android:name=".Activities.AboutInstitution" />
+        <activity android:name=".Activities.AddAdmin.AddAdminActivity" />
+        <activity android:name=".Activities.ChooseIntitution.ChooseInstitutionActivity" />
+        <activity android:name=".Activities.Launch.RegisterForInstitutionActivity" />
+        <activity android:name=".Activities.Launch.RegisterInstitutionActivity" />
+        <activity android:name=".Activities.Launch.LaunchActivity" />
+        <activity android:name=".Activities.OpenNotice.OpenNoticeActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.finalyearproject.provider"
             android:exported="false"
-            android:grantUriPermissions="true">
+            android:grantUriPermissions="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/paths" />
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
         </provider>
 
         <activity android:name=".Activities.AddNoticeActivity" />

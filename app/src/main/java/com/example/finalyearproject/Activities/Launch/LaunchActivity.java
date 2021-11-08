@@ -172,11 +172,11 @@ public class LaunchActivity extends AppCompatActivity implements FirebaseAuth.Au
 
     @Override
     public void onAuthStateChanged(@NonNull @NotNull FirebaseAuth firebaseAuth) {
-        if (mFirebaseAuth.getCurrentUser() != null) {
-            if(checkSavedInstitution()){
-                getInstDetails();
-            }
-        }
+//        if (mFirebaseAuth.getCurrentUser() != null) {
+//            if(checkSavedInstitution()){
+//                getInstDetails();
+//            }
+//        }
     }
 
     @Override

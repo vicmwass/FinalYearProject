@@ -10,18 +10,70 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        android:theme="@style/Theme.FinalYearProject"
+        android:background="?attr/colorPrimary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
+
+    <LinearLayout
+        android:id="@+id/logo"
+        android:layout_width="match_parent"
+        android:layout_height="177dp"
+        android:padding="20dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/logo_image"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            android:layout_gravity="center"
+
+            android:src="@drawable/camera_24" />
+
+        <TextView
+            android:id="@+id/text_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/logo_image_text"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:labelFor="@+id/profile_image"
+            android:text="LOGO" />
+
+
+    </LinearLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/wraper_et_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_to_top_view"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/wraper_et_inst_name"
+        android:layout_marginStart="@dimen/margin_start"
+        android:layout_marginEnd="@dimen/margin_start">
+        <EditText
+            android:id="@+id/et_description"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/multiline_et_height"
+            android:hint="Enter vision or mission of institution"
+            android:inputType="textMultiLine"
+            android:textAlignment="viewStart"
+            android:layout_margin="@dimen/edit_text_margin"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/wraper_et_inst_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_to_top"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintTop_toBottomOf="@+id/logo"
         android:layout_marginStart="@dimen/margin_start"
         android:layout_marginEnd="@dimen/margin_start">
         <EditText
@@ -37,15 +89,42 @@
             />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+
+    <TextView
+        android:id="@+id/select_theme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/edit_text_margin"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="40dp"
+        android:inputType="text"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:text="Select Theme"
+        android:textAlignment="viewStart"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/wraper_et_description" />
+
+    <Spinner
+        android:id="@+id/theme_spinner"
+        android:layout_width="205dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="48dp"
+        android:entries="@array/themes"
+        app:layout_constraintBottom_toBottomOf="@+id/select_theme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/select_theme" />
+
     <Button
         android:id="@+id/btn_save_inst"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="save"
-        android:layout_marginTop="@dimen/margin_to_top_view"
-        app:layout_constraintStart_toStartOf="@+id/wraper_et_inst_name"
-        app:layout_constraintTop_toBottomOf="@+id/wraper_et_inst_name"
-    />
+        app:layout_constraintStart_toStartOf="@+id/select_theme"
+        app:layout_constraintTop_toBottomOf="@+id/theme_spinner" />
 <!--    <com.google.android.material.textfield.TextInputLayout-->
 <!--        android:id="@+id/wraper_et_subject"-->
 <!--        android:layout_width="match_parent"-->

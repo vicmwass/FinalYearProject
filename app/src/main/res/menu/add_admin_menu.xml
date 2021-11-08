@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/save_admin"
         android:title="Save admin"
+        android:icon="@drawable/save_24"
+        app:showAsAction="ifRoom"
         />
 <!--    <item android:id="@+id/search_bar"-->
 <!--        android:title="Search"-->

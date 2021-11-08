@@ -2,6 +2,7 @@ package com.example.finalyearproject.Activities.ChooseIntitution;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import static android.content.Context.MODE_PRIVATE;
 import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
+import static com.example.finalyearproject.Activities.Main.MainActivity.SHARED_PREFS;
+import static com.example.finalyearproject.Activities.SplashScreen.APP_THEME;
 
 public class InstitutionAdapter extends RecyclerView.Adapter<InstitutionAdapter.InstitutionViewHolder>{
     ArrayList<String> mInstList;
@@ -45,6 +49,7 @@ public class InstitutionAdapter extends RecyclerView.Adapter<InstitutionAdapter.
                 public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                     if(task.isSuccessful()){
                         Institution selectedInst=task.getResult().toObject(Institution.class);
+                        savePrefData(selectedInst.getTheme());
                         Intent lIntent=new Intent(mActivity, MainActivity.class);
                         lIntent.putExtra(INSTITUTION_DETAILS, (Serializable)selectedInst);
                         lIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -95,6 +100,13 @@ public class InstitutionAdapter extends RecyclerView.Adapter<InstitutionAdapter.
             mRCard = itemView.findViewById(R.id.inst_card);
             mTvName = itemView.findViewById(R.id.tv_inst_name);
         }
+    }
+
+    private void savePrefData(String theme) {
+        SharedPreferences lSharedPreferences=mActivity.getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+        SharedPreferences.Editor lEditor=lSharedPreferences.edit();
+        lEditor.putString(APP_THEME,theme);
+        lEditor.apply();
     }
 
 }

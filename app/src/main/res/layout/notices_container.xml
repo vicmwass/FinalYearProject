@@ -8,11 +8,18 @@
     android:layout_height="match_parent"
     tools:context=".Activities.Main.Notices.NoticeListFragment">
 
+
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <androidx.appcompat.widget.SearchView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/action_search"
+        android:focusable="false"/>
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swiperefresh"
+        android:layout_below="@+id/action_search"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     <ScrollView

@@ -16,23 +16,26 @@ import androidx.viewpager.widget.ViewPager;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.finalyearproject.Activities.AboutInstitution;
-import com.example.finalyearproject.Activities.AddAdmin.AddAdminActivity;
-import com.example.finalyearproject.Activities.AddDomain.AddDomainActivity;
+
 import com.example.finalyearproject.Activities.AddNoticeActivity;
-import com.example.finalyearproject.Activities.InstUsersActivity;
+import com.example.finalyearproject.Activities.ReportActivity;
+import com.example.finalyearproject.Activities.ViewUsers.ListAllUsers.UsersListActivity;
 import com.example.finalyearproject.Activities.Launch.LaunchActivity;
 import com.example.finalyearproject.Activities.ChooseIntitution.ChooseInstitutionActivity;
-import com.example.finalyearproject.Activities.Launch.RegisterForInstitutionActivity;
 import com.example.finalyearproject.Activities.Main.ChatGroup.ChatFragment;
 import com.example.finalyearproject.Activities.Main.Notices.NoticeListFragment;
-import com.example.finalyearproject.Activities.ProfileActivity;
+import com.example.finalyearproject.Activities.ViewUsers.ListAdmins.ViewAdminsActivity;
+import com.example.finalyearproject.Activities.SettingsActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.Institution;
 import com.example.finalyearproject.Modules.NavObjects;
@@ -47,16 +50,18 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_CODE;
 import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
+import static com.example.finalyearproject.Activities.SplashScreen.APP_THEME;
 
  public class  MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
-    public static final String IDLIST="idList";
-    public static final String DNAME="domainN";
+    public static final String ID_LIST ="idList";
+    public static final String D_NAME ="domainN";
     public static final String NOTICE="notice";
 
     public static final String INSTITUTION_LIST = "institutionList";
@@ -79,21 +84,22 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
     private Menu mOptionMenu;
     private Boolean mIsAdmin;
     private Boolean mInitial =true;
-//     private int mChatLevel=0;
+     private CircleImageView mImageView;
+     //     private int mChatLevel=0;
 
 
      @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+         changeTheme(this);
          setContentView(R.layout.activity_main);
-        Intent lIntent=getIntent();
-        mInstDetails = (Institution) lIntent.getParcelableExtra(INSTITUTION_DETAILS);
+         Intent lIntent=getIntent();
+         mImageView=findViewById(R.id.logo_main);
+         mInstDetails = (Institution) lIntent.getParcelableExtra(INSTITUTION_DETAILS);
+         showImage(mInstDetails.getLogoUri());
          mInstCode = mInstDetails.getCode();
-
-
-        setupViewModel();
-        setupNavigatioView();
+         setupViewModel();
+        setupNavigationView();
         setupAdapter();
 //        getSupportFragmentManager().beginTransaction()
 //                .add(R.id.domains_frame, new DomainListFragment())
@@ -101,11 +107,57 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
 //                .commit();
     }
 
+     public static void changeTheme(Activity activity) {
+         SharedPreferences lSharedPreferences=activity.getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+         String apptheme = lSharedPreferences.getString(APP_THEME,"");
+         if(apptheme!=null){
+         switch (apptheme){
+             case "blue focused":
+                 activity.setTheme(R.style.Theme_FinalYearProject);
+                 break;
+             case "green focused":
+                 activity.setTheme(R.style.Theme_FinalYearProject1);
+                 break;
+             case "red focused":
+                 activity.setTheme(R.style.Theme_FinalYearProject2);
+                 break;
+             case "yellow focused":
+                 activity.setTheme(R.style.Theme_FinalYearProject3);
+                 break;
+             case "purple focused":
+                 activity.setTheme(R.style.Theme_FinalYearProject4);
+                 break;
+            }
+        }
+    }
+
      @Override
      protected void onResume() {
          super.onResume();
          mNavigationView.setCheckedItem(R.id.nav_home);
          mFinalExit =false;
+     }
+
+     @Override
+     public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+         super.onSaveInstanceState(outState, outPersistentState);
+         outState.putString("instCode",mInstCode);
+         outState.putParcelable("instDetails",mInstDetails);
+     }
+
+     public void showImage(String url){
+         if(url!=null&&url.isEmpty()==false){
+             int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+             Glide.with(this).load(url).override(width*1/2, width*2/3).
+                     centerCrop().into(mImageView);
+         }
+     }
+
+     @Override
+     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+         super.onRestoreInstanceState(savedInstanceState);
+         mInstDetails=savedInstanceState.getParcelable("instDetails");
+         mInstCode=savedInstanceState.getString("instCode");
      }
 
      private void setupAdapter() {
@@ -116,7 +168,7 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
         mViewPager.setAdapter(mViewPageAdapter);
     }
 
-     private void changefragment(int type ) {
+     private void changeFragment(int type ) {
          Fragment newFragment;
          if(type==0){
              newFragment = ChatFragment.newInstance();
@@ -145,7 +197,7 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
              getSupportFragmentManager().beginTransaction().remove(removeFragment).commitNow();
      }
 
-    private void setupNavigatioView() {
+    private void setupNavigationView() {
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(mInstDetails.getName());
@@ -183,10 +235,8 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                 if(mViewModel.getPrivacyLevel().getValue()<1){
                     if(idList.contains(mViewModel.getAdminLevel().getValue())||mViewModel.getAdminLevel().getValue().equals("Main")){
                         mIsAdmin =true;
-                        mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,true);
                     }else {
                         mIsAdmin =false;
-                        mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,false);
                 }}
 
                 if(mIdList.size()>0&&mViewModel.getChatGroupIds().getValue().contains(mIdList.get(mIdList.size()-1))){
@@ -205,9 +255,9 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
             public void onChanged(Boolean aBoolean) {
                 if(!mInitial){
                 if(aBoolean){
-                    changefragment(0);
+                    changeFragment(0);
                 }else{
-                    changefragment(1);
+                    changeFragment(1);
                 }
             }
                 mInitial=false;
@@ -239,9 +289,7 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
 
                     if(mIdList.contains(mViewModel.getPrivateDomainAdminLevel().getValue())){
                         mIsAdmin =true;
-                        mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,true);
                     }else{
-                        mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,false);
                         mIsAdmin =false;
                     }
                 }
@@ -250,62 +298,41 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
     }
 
 
-    @Override
+
+     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_activity_menu,menu);
         mOptionMenu = menu;
         return true;
     }
 
+     @Override
+     public boolean onPrepareOptionsMenu(Menu menu) {
+         if(mIsAdmin){
+             menu.setGroupVisible(R.id.for_admin,true);
+         }else {
+             menu.setGroupVisible(R.id.for_admin,false);
+         }
+         if(mViewModel.getIsChatGroup().getValue()){
+             menu.setGroupVisible(R.id.report_generation,false);
+         }else {
+             menu.setGroupVisible(R.id.report_generation,true);
+         }
+         return super.onPrepareOptionsMenu(menu);
+     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        if(mViewModel.getPrivacyLevel().getValue()>0){
-            mViewModel.getPrivateDomainAdminLevel().observe(this, new Observer<String>() {
-                @Override
-                public void onChanged(String s) {
-                    if(mIdList.contains(s)){
-                        menu.setGroupVisible(R.id.for_admin, true);
-                    }else {
-                        menu.setGroupVisible(R.id.for_admin, false);
-                    }}});
-        }else{
-            mViewModel.getAdminLevel().observe(this, new Observer<String>() {
-                @Override
-                public void onChanged(String s) {
-                    if(s.equals("Main")||mIdList.contains(s)){
-                        menu.setGroupVisible(R.id.for_admin, true);
-                    }else{
-                        menu.setGroupVisible(R.id.for_admin, false);
-                    }}});
-        }
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         ArrayList<String> adminList;
         if(mViewModel.getPrivacyLevel().getValue()>0)
-            adminList=mViewModel.getPrivateCurrentAdminList().getValue();
-        else adminList=mViewModel.getCurrentAdminList().getValue();
+            adminList=new ArrayList<>(mViewModel.getPrivateCurrentAdminList().getValue());
+
+        else adminList=new ArrayList<>(mViewModel.getCurrentAdminList().getValue());
+
         NavObjects lNavObjects=new NavObjects(mIdList,mInstDetails,mDomainName,
-                adminList,mViewModel.getPrivateMemberList().getValue(), mIsAdmin);
+                adminList,mViewModel.getPrivateMemberList().getValue(), mIsAdmin,mViewModel.getPrivacyLevel().getValue());
         switch (item.getItemId()){
-            case R.id.to_new_domains:
-                Intent DIntent=new Intent(this, AddDomainActivity.class);
-                DIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
-                startActivity(DIntent);
-                break;
-            case R.id.to_new_notice:
-                Intent NIntent =new Intent(this, AddNoticeActivity.class);
-                NIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
-                startActivity(NIntent);
-                break;
-            case R.id.add_admin:
-                Intent AIntent =new Intent(this, AddAdminActivity.class);
-                AIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
-                startActivity(AIntent);
-                break;
             case R.id.sign_out:
                 FirebaseAuth.getInstance().signOut();
                 clearPrefData();
@@ -314,15 +341,31 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                 startActivity(OIntent);
                 finish();
                 break;
+            case R.id.send_notice:
+                Intent AIntent =new Intent(this, AddNoticeActivity.class);
+                AIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
+                startActivity(AIntent);
+                break;
+            case R.id.settings:
+                Intent SIntent = new Intent(this, SettingsActivity.class);
+                SIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
+                startActivity(SIntent);
+                break;
             case R.id.users_list:
-                Intent MIntent =new Intent(this, InstUsersActivity.class);
-                MIntent.putExtra(INSTITUTION_CODE,mInstCode);
+                Intent MIntent =new Intent(this, UsersListActivity.class);
+                MIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
                 startActivity(MIntent);
                 break;
-            case R.id.user_profile:
-                Intent PIntent =new Intent(this, ProfileActivity.class);
-                startActivity(PIntent);
+            case R.id.admin_list:
+                Intent AdIntent =new Intent(this, ViewAdminsActivity.class);
+                AdIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
+                startActivity(AdIntent);
                 break;
+            case R.id.notices_report:
+                Intent RdIntent =new Intent(this, ReportActivity.class);
+                RdIntent.putExtra(NAV_OBJECT,(Parcelable) lNavObjects);
+                startActivity(RdIntent);
+
 
 
         }
@@ -347,6 +390,8 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
             mViewModel.setDomainNameList(mDomainNameList);
             if(mViewModel.getPrivacyLevel().getValue()>0)mViewModel.decrementPrivacyLevel();
             mViewModel.setIdList(mIdList);
+//            if(mViewModel.getCurrentAdminList().getValue().size()>0)
+
 
         }else{
             if(mFinalExit){
@@ -365,20 +410,30 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
         SharedPreferences.Editor lEditor=lSharedPreferences.edit();
         lEditor.putString(INSTITUTION_CODE,mInstCode);
         lEditor.apply();
+        lEditor.remove(APP_THEME).commit();
+
     }
     private void clearPrefData(){
         SharedPreferences lSharedPreferences=getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
         SharedPreferences.Editor lEditor=lSharedPreferences.edit();
-        lEditor.remove(INSTITUTION_CODE).commit();
+        lEditor.remove(INSTITUTION_CODE).remove(APP_THEME).commit();
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         ArrayList<String> adminList;
         if(mViewModel.getPrivacyLevel().getValue()>0)
-            adminList=mViewModel.getPrivateCurrentAdminList().getValue();
-        else adminList=mViewModel.getCurrentAdminList().getValue();
-        NavObjects lNavObjects=new NavObjects(mIdList,mInstDetails,mDomainNameList.get(mDomainNameList.size()-1),adminList,mViewModel.getPrivateMemberList().getValue(),mIsAdmin);
+            adminList=new ArrayList<>(mViewModel.getPrivateCurrentAdminList().getValue());
+        else adminList=new ArrayList<>(mViewModel.getCurrentAdminList().getValue());
+        if(!mViewModel.getAdminLevel().getValue().equals("")&&!mViewModel.getAdminLevel().getValue().equals("main")){
+            mIsAdmin=true;
+        }else {
+            mIsAdmin=false;
+        }
+        NavObjects lNavObjects=new NavObjects(mIdList,mInstDetails
+                ,mDomainNameList.get(mDomainNameList.size()-1),adminList
+                ,mViewModel.getPrivateMemberList().getValue(),mIsAdmin
+                ,mViewModel.getPrivacyLevel().getValue());
         navigationSwitch(this,item,lNavObjects, mDrawerLayout);
         return true;
     }
@@ -391,32 +446,16 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                 activity.startActivity(i);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
-            case R.id.to_new_domains:
-                Intent DIntent=new Intent(activity, AddDomainActivity.class);
-                DIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
-                activity.startActivity(DIntent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.to_new_notice:
-                Intent NIntent =new Intent(activity, AddNoticeActivity.class);
-                NIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
-                activity.startActivity(NIntent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.choose_institution:
-                chooseInstitution(activity,navObjects, drawerLayout);
-                drawerLayout.closeDrawer(GravityCompat.START);
-                break;
-            case R.id.add_institution:
-                Intent RIntent =new Intent(activity, RegisterForInstitutionActivity.class);
-                RIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
-                activity.startActivity(RIntent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-                break;
             case R.id.about_institution:
                 Intent AIIntent =new Intent(activity, AboutInstitution.class);
                 AIIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
                 activity.startActivity(AIIntent);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                break;
+            case R.id.settings:
+                Intent SIntent =new Intent(activity, SettingsActivity.class);
+                SIntent.putExtra(NAV_OBJECT,(Parcelable) navObjects);
+                activity.startActivity(SIntent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
         }
@@ -439,6 +478,5 @@ import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INST
                         }
                     }
                 });
-
     }
 }

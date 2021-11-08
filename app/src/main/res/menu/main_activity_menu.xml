@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group android:id="@+id/for_admin"
-        >
-        <item android:id="@+id/to_new_domains"
-            android:title="Add subdomain"
-            />
-        <item android:id="@+id/to_new_notice"
-            android:title="Add notice"
-            />
-        <item android:id="@+id/add_admin"
-            android:title="Add Admin"
-            />
-    </group>
+
+
     <item android:id="@+id/sign_out"
         android:title="Sign out"
         />
+    <group
+        android:id="@+id/for_admin">
+        <item
+            android:id="@+id/send_notice"
+            android:title="Send Notice" />
+    </group>
     <item android:id="@+id/users_list"
         android:title="Members"
         />
-    <item android:id="@+id/user_profile"
-        android:title="Profile"
+    <item android:id="@+id/admin_list"
+        android:title="View Admins"
         />
+    <item android:id="@+id/settings"
+        android:title="Settings"
+        />
+    <group
+        android:id="@+id/report_generation">
+    <item android:id="@+id/notices_report"
+        android:title="Generate Report"
+        />
+    </group>
 
 </menu>

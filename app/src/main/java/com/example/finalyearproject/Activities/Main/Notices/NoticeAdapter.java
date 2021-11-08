@@ -3,11 +3,12 @@ package com.example.finalyearproject.Activities.Main.Notices;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -18,7 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.finalyearproject.Activities.Launch.LaunchActivity;
 import com.example.finalyearproject.Activities.Main.MainActivity;
 import com.example.finalyearproject.Activities.Main.SharedViewModel;
-import com.example.finalyearproject.Activities.OpenNoticeActivity;
+import com.example.finalyearproject.Activities.OpenNotice.OpenNoticeActivity;
+import com.example.finalyearproject.Activities.ViewUsers.ListAdmins.ViewAdminsAdapter;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.Notice;
 import com.example.finalyearproject.Modules.User;
@@ -31,14 +33,20 @@ import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
-public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeViewHolder>{
+public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeViewHolder> implements Filterable {
     ArrayList<Notice> mNoticeList=new ArrayList<Notice>();
+    ArrayList<Notice> mAllNoticeList=new ArrayList<Notice>();
+    private ArrayList<String> mSenderList =new ArrayList<>();
+    private ArrayList<String> mAllSenderList =new ArrayList<>();
     ArrayList <String> mIdList = new ArrayList<String>();
     Context mContext;
     private CollectionReference mNoticeRef;
@@ -54,6 +62,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
 
     private void populateArray() {
         mNoticeList.clear();
+        mAllNoticeList.clear();
         mNoticeRef = FirebaseUtils.FIRESTORE.collection("Institutions").document(mViewModel.getInstCode().getValue()).collection("notices");
         if(mIdList.size()>0){
                 mNoticeRef = mNoticeRef.document(mIdList.get(mIdList.size()-1)).collection("my_notices");
@@ -61,7 +70,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
             mNoticeRef = mNoticeRef.document("0").collection("my_notices");
         }
 
-        mNoticeRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        mNoticeRef.orderBy("timeStamp", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
@@ -76,8 +85,20 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
                                 String id = dc.getDocument().getId();
                                 Notice lNotice = dc.getDocument().toObject(Notice.class).withId(id);
                                 mNoticeList.add(lNotice);
+                                mAllNoticeList.add(lNotice);
+                                FirebaseUtils.FIRESTORE.collection("users").document(lNotice.getSenderId())
+                                        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
+                                        if(task.isSuccessful()){
+                                            mAllSenderList.add((String) task.getResult().get(User.USERNAME));
+                                            if(mAllSenderList.size()==mAllNoticeList.size()){
+                                                NoticeAdapter.this.notifyDataSetChanged();
+                                            }
+                                        }
+                                    }
+                                });
                                 Log.d("NoticeSender", lNotice.getSenderId());
-                                NoticeAdapter.this.notifyDataSetChanged();
                                 break;
                             case MODIFIED:
                                 break;
@@ -112,10 +133,11 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
             @Override
             public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){
-                        holder.tvSender.setText((String) task.getResult().get(User.USERNAME));
+                    holder.tvSender.setText((String) task.getResult().get(User.USERNAME));
                 }
             }
         });
+
         holder.tvSubject.setText(lNotice.getSubject());
         holder.rlCard.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,6 +145,7 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
                 Intent lIntent=new Intent(mContext, OpenNoticeActivity.class);
                 lIntent.putExtra(MainActivity.NOTICE,lNotice);
                 lIntent.putExtra(LaunchActivity.INSTITUTION_CODE,mViewModel.getInstCode().getValue());
+                lIntent.putExtra("Domain ids",mViewModel.getIdList().getValue());
                 mContext.startActivity(lIntent);
             }
         });
@@ -133,15 +156,12 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
             holder.tvDescription.setVisibility(View.INVISIBLE);
         }
 
-        if(lNotice.getDomainName()==null){
-            holder.tvFrom.setVisibility(View.INVISIBLE);
-            holder.tvFromDomain.setVisibility(View.INVISIBLE);
-        }else{
-            holder.tvFrom.setVisibility(View.VISIBLE);
-            holder.tvFromDomain.setVisibility(View.VISIBLE);
-            holder.tvFromDomain.setText(lNotice.getDomainName());
+        if(lNotice.getTimeStamp()!=null){
+        Date currentDate = new Date(lNotice.getTimeStamp()*1000);
+        SimpleDateFormat dateFormat= new SimpleDateFormat("dd MMM ");
+        String dateOnly = dateFormat.format(currentDate);
+        holder.tvSentDate.setText(dateOnly);
         }
-
 
     }
 
@@ -156,8 +176,9 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
         TextView tvDescription;
         Button button;
         RelativeLayout rlCard;
-        TextView tvFrom;
-        TextView tvFromDomain;
+//        TextView tvFrom;
+//        TextView tvFromDomain;
+        TextView tvSentDate;
 
         public NoticeViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -165,12 +186,53 @@ public class NoticeAdapter extends RecyclerView.Adapter<NoticeAdapter.NoticeView
             tvSubject=itemView.findViewById(R.id.tv_subject);
             tvDescription=itemView.findViewById(R.id.tv_description);
             rlCard=itemView.findViewById(R.id.notice_card);
-            tvFrom = itemView.findViewById(R.id.tv_from);
-            tvFromDomain = itemView.findViewById(R.id.tv_from_domain_name);
+//            tvFrom = itemView.findViewById(R.id.tv_from);
+//            tvFromDomain = itemView.findViewById(R.id.tv_from_domain_name);
+            tvSentDate=itemView.findViewById(R.id.tv_sent_date);
 //            button=itemView.findViewById(R.id.notice_download_button);
         }
     }
 
+    @Override
+    public Filter getFilter() {
+        return instUserFilter;
+    }
+    private Filter instUserFilter=new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            ArrayList<Notice> lFilteredList=new ArrayList<>();
+            if(constraint==null||constraint.length()==0){
+                lFilteredList.addAll(mAllNoticeList);
+            }else {
+                String lFilterPattern=constraint.toString().toLowerCase().trim();
+                for (Notice lNotice:mAllNoticeList){
+                    if(!lFilteredList.contains(lNotice)){
+                    if(lNotice.getSubject().contains(lFilterPattern)){
+                        lFilteredList.add(lNotice);
+                    }else if(lNotice.getDescription().contains(lFilterPattern)){
+                        lFilteredList.add(lNotice);
+                    }
+                    }
+                }
+                for(int i=0;i<mAllSenderList.size();i++){
+//                    mSenderList.clear();
+                    if(!lFilteredList.contains(mAllNoticeList.get(i))&&
+                            mAllSenderList.get(i).contains(lFilterPattern)){
+                        lFilteredList.add(mAllNoticeList.get(i));
+                    }
 
-
+                }
+            }
+            FilterResults  lResults=new FilterResults();
+            lResults.values=lFilteredList;
+            return lResults;
         }
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            mNoticeList.clear();
+            mNoticeList.addAll((ArrayList)results.values);
+            NoticeAdapter.this.notifyDataSetChanged();
+        }
+    };
+
+}

@@ -8,46 +8,9 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:id="@+id/toolbar">
+        android:id="@+id/toolbar"
+        />
 
-
-        <RelativeLayout
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:id="@+id/back_arrow">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/arrow_back_24"
-                android:layout_centerVertical="true"
-                android:id="@+id/image_back_arrow"/>
-
-        </RelativeLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/fragment_heading"
-            android:layout_toRightOf="@+id/back_arrow"
-            android:textSize="20sp"/>
-
-    </androidx.appcompat.widget.Toolbar>
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="matrix"
-            android:alpha=".1"
-            android:id="@+id/background"/>
-
-    </RelativeLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -72,6 +35,15 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/camera_24"
                     android:id="@+id/profile_image"
+                    android:layout_centerInParent="true"
+                    />
+                <ProgressBar
+                    android:id="@+id/progressBarupload"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_below="@+id/profile_image"
                     android:layout_centerInParent="true"
                     />
 

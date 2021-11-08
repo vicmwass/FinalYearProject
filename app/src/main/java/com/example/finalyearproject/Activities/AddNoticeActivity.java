@@ -1,12 +1,5 @@
 package com.example.finalyearproject.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -26,6 +19,12 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.finalyearproject.Activities.Main.MainActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
@@ -52,7 +51,7 @@ import static com.example.finalyearproject.Activities.Main.MainActivity.NAV_OBJE
 import static com.example.finalyearproject.HelperClasses.FirebaseUtils.FIRESTORE;
 import static com.example.finalyearproject.HelperClasses.FirebaseUtils.INSTITUTIONS;
 
-public class AddNoticeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class AddNoticeActivity extends AppCompatActivity{
 
     private EditText mEtSubject;
     private TextView mTvUpload;
@@ -75,7 +74,7 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        FirebaseUtils.signInAnonymously(this);
+        MainActivity.changeTheme(this);
         setContentView(R.layout.activity_add_notice);
 
         Intent lIntent=getIntent();
@@ -85,7 +84,6 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
         mInstCode = mInstDetails.getCode();
         mDomainName= mNavObjects.getDomainName();
         initializeViews();
-        setupNavigationView();
 
 
 
@@ -94,7 +92,6 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
     @Override
     protected void onResume() {
         super.onResume();
-        mNavigationView.setCheckedItem(R.id.to_new_notice);
     }
 
     private void initializeViews() {
@@ -102,14 +99,18 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
         mDescription = findViewById(R.id.et_description);
         mTvUpload = findViewById(R.id.tv_upload_file);
         mRadioGroup = findViewById(R.id.comments);
-        mButton = findViewById(R.id.upload_button);
+//        mButton = findViewById(R.id.upload_button);
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setTitle(mInstDetails.getName());
-        getSupportActionBar().setSubtitle(mDomainName);
+        getSupportActionBar().setTitle(mDomainName);
+        getSupportActionBar().setSubtitle("Send Notice");
+        // add back arrow to toolbar
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
 
-        mDrawerLayout =findViewById(R.id.drawer_layout);
-        mNavigationView =findViewById(R.id.nav_view);
+
 
         mTvUpload.addTextChangedListener(new TextWatcher() {
             @Override
@@ -131,35 +132,18 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
 
             }
         });
-        mButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*");
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-//                intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
-                startActivityForResult(intent.createChooser(intent,"select file"),FILE_RESULT);
-            }
-        });
+//        mButton.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                intent.setType("*/*");
+//                intent.addCategory(Intent.CATEGORY_OPENABLE);
+////                intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+//                startActivityForResult(intent.createChooser(intent,"select file"),FILE_RESULT);
+//            }
+//        });
     }
 
-    private void setupNavigationView() {
-        mNavigationView.bringToFront();//when navdrawer items clicked show that color to represent click
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawerLayout,mToolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
-        mDrawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-        //to make navigation drawer clickable
-        mNavigationView.setNavigationItemSelectedListener(this);
-
-        mNavigationView.setCheckedItem(R.id.to_new_notice);
-
-        if(mNavObjects.getIsAdmin()){
-            mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,true);
-        }else {
-            mNavigationView.getMenu().setGroupVisible(R.id.nav_for_admin,false);
-        }
-    }
 
 
     private Boolean checkDetails(){
@@ -184,6 +168,8 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
         mNotice.setSenderId(FirebaseAuth.getInstance().getUid());
         mNotice.setSubject(lSubject);
         mNotice.setFileName(mTvUpload.getText().toString());
+        long unixTime = System.currentTimeMillis() / 1000L;
+        mNotice.setTimeStamp(unixTime);
 
 
         return true;
@@ -231,6 +217,9 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
                 if(checkDetails()){
                     saveNotice();
                 }
+                break;
+            case android.R.id.home:
+                finish();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -307,17 +296,6 @@ public class AddNoticeActivity extends AppCompatActivity implements NavigationVi
 
                     }
                 });
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull @NotNull MenuItem item) {
-        MainActivity.navigationSwitch(this,item,mNavObjects, mDrawerLayout);
-        return true;
     }
 
 

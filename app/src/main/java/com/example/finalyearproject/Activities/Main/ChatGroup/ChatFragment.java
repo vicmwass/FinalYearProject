@@ -21,6 +21,7 @@ import com.example.finalyearproject.Activities.Main.SharedViewModel;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
 import com.example.finalyearproject.Modules.ChatMessage;
 import com.example.finalyearproject.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 
 import org.jetbrains.annotations.NotNull;
@@ -106,7 +107,7 @@ public class ChatFragment extends Fragment {
         mInputChat.setText("");
         ChatMessage chat=new ChatMessage();
         chat.setMessage(text);
-        chat.setUserID(FirebaseUtils.sFirebaseAuth.getUid());
+        chat.setUserID(FirebaseAuth.getInstance().getUid());
 //        Long tsLong = System.currentTimeMillis()/1000;
         chat.addTimeStampToken(FieldValue.serverTimestamp());
         FirebaseUtils.addChat(mViewModel.getInstCode().getValue(),getActivity(),chat,mViewModel.getIdList().getValue().get(mViewModel.getIdList().getValue().size()-1));

@@ -108,21 +108,22 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     public void onBindViewHolder(@NonNull @NotNull ChatAdapter.ChatViewHolder holder, int position) {
         Text chat=mChatList.get(position);
         holder.mText.setText(chat.getMessage());
-        holder.mChatContainer.setGravity(Gravity.LEFT);
         FirebaseUtils.FIRESTORE.collection("users").document(chat.getUserID())
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){
-                    if(mFirebaseAuth.getCurrentUser().getDisplayName().equals(chat.getUserID())){
+                    if(mFirebaseAuth.getUid().equals(chat.getUserID())){
                         holder.mUsername.setText("you");
                         holder.mChatContainer.setGravity(Gravity.RIGHT);
                     }else {
                         holder.mUsername.setText((String) task.getResult().get(User.USERNAME));
+                        holder.mChatContainer.setGravity(Gravity.LEFT);
                     }
                 }
             }
         });
+
 
 
     }

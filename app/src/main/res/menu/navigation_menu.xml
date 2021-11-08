@@ -1,35 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/home_24"
             android:title="Home" />
-        <group android:id="@+id/nav_for_admin">
-            <item
-                android:id="@+id/to_new_domains"
-                android:icon="@drawable/group_add_24"
-                android:title="Add Subdomain" />
-            <item
-                android:id="@+id/to_new_notice"
-                android:icon="@drawable/send_24"
-                android:title="Send Notice" />
-        </group>
-        <item
-            android:id="@+id/choose_institution"
-            android:icon="@drawable/domain_24"
-            android:title="Change Institution" />
-        <item
-            android:id="@+id/add_institution"
-            android:icon="@drawable/business_24"
-            android:title="Register for new Institution" />
         <item
             android:id="@+id/about_institution"
             android:icon="@drawable/info_24"
             android:title="About Institution" />
+        <item
+            android:id="@+id/settings"
+            android:icon="@drawable/settings_24"
+            android:title="Settings" />
 
 
-    </group>
 
 
 <!--    <item android:title="Account">-->

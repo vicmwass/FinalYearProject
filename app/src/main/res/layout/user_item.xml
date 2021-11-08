@@ -6,18 +6,28 @@
     android:layout_margin="@dimen/card_margin"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".Activities.UserListAdapter"
+    tools:context=".Activities.ViewUsers.ListAllUsers.UsersListAdapter"
     >
     <RelativeLayout
         android:id="@+id/inst_user_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="20dp">
+        android:padding="15dp">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/person_outline_24"
+            android:layout_marginEnd="@dimen/edit_text_margin"
+            android:id="@+id/profile_image"
+
+            />
 
         <TextView
             android:id="@+id/tv_user_name2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/profile_image"
             android:text="user name"
             android:textSize="20sp"
             android:textStyle="bold"

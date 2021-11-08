@@ -1,9 +1,8 @@
 package com.example.finalyearproject.Activities.AddAdmin;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.os.Parcelable;
-import android.util.Log;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,37 +11,28 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.ceylonlabs.imageviewpopup.ImagePopup;
 import com.example.finalyearproject.Activities.AddDomain.AddDomainViewModel;
-import com.example.finalyearproject.Activities.Launch.RegisterForInstitutionActivity;
-import com.example.finalyearproject.Activities.Main.MainActivity;
 import com.example.finalyearproject.HelperClasses.FirebaseUtils;
-import com.example.finalyearproject.Modules.InstUser;
-import com.example.finalyearproject.Modules.Institution;
 import com.example.finalyearproject.Modules.User;
 import com.example.finalyearproject.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import static com.example.finalyearproject.Activities.Launch.LaunchActivity.INSTITUTION_DETAILS;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHolder> implements Filterable {
     ArrayList<User> mInstUserList=new ArrayList<>();
@@ -58,15 +48,18 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
     private ArrayList<String> mUsers;
 
     public AdminAdapter(Activity activity,String instCode,AddAdminViewModel viewModel) {
+
         this.mInstCode=instCode;
         this.mViewModel=viewModel;
         this.mActivity=activity;
         mCurrentAdmins = mViewModel.getCurrentAdminSet().getValue();
         mMembersOfPrivateDomain = mViewModel.getMembersOfPrivateDomain().getValue();
         populateData();
+
     }
 
     public void includeAllPotentialAdmins() {
+
         mInstUserList.clear();
         mInstUserPreFilterList.clear();
         for (User lUser:mAllInstUserList){
@@ -76,9 +69,11 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
         }
         mInstUserPreFilterList.addAll(mInstUserList);
         AdminAdapter.this.notifyDataSetChanged();
+
     }
 
     private void populateData() {
+
         mAllInstUserList.clear();
         FirebaseUtils.FIRESTORE.collection(FirebaseUtils.INSTITUTIONS).document(mInstCode)
                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -89,7 +84,6 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
                     for (String userid:mUsers) {
                         FirebaseUtils.FIRESTORE.collection("users").document(userid)
                                 .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-
                             @Override
                             public void onComplete(@NonNull @NotNull Task<DocumentSnapshot> task) {
                                 if (task.isSuccessful()) {
@@ -109,6 +103,7 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
                 }
             }
         });
+
     }
 
     public void includeMembersOnly(AddDomainViewModel domainViewModel){
@@ -132,7 +127,7 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
     @NonNull
     @Override
     public AdminViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View lView = LayoutInflater.from(parent.getContext()).inflate(R.layout.admin_users_card,parent,false);
+        View lView = LayoutInflater.from(parent.getContext()).inflate(R.layout.select_users_card,parent,false);
         AdminViewHolder lAdminViewHolder=new AdminViewHolder(lView);
         return lAdminViewHolder;
     }
@@ -149,6 +144,11 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
                 }else {
                     holder.mCbUser.setChecked(false);
                 }
+                if(lInstUser.getImgUri()!=null){
+                    showImage(lInstUser.getImgUri(), holder.mImageView);
+                }else {
+                    holder.mImageView.setImageResource(R.drawable.person_outline_24);
+                }
             }
         });
         holder.mRCard.setOnClickListener(new View.OnClickListener() {
@@ -164,6 +164,15 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
             }
         });
         holder.mCbUser.setClickable(false);
+        if(lInstUser.getImgUri()!=null){
+            showImage(lInstUser.getImgUri(), holder.mImageView);
+        }
+        holder.mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupImage(holder.mImageView,lInstUser.getImgUri());
+            }
+        });
     }
 
 
@@ -211,12 +220,38 @@ public class AdminAdapter extends RecyclerView.Adapter<AdminAdapter.AdminViewHol
         private final RelativeLayout mRCard;
         private final TextView mTvName;
         private final CheckBox mCbUser;
+        private final CircleImageView mImageView;
 
         public AdminViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
             mRCard = itemView.findViewById(R.id.admin_card);
             mTvName = itemView.findViewById(R.id.tv_user_name);
             mCbUser = itemView.findViewById(R.id.user_checkbox);
+            mImageView=itemView.findViewById(R.id.profile_image);
         }
+    }
+    public void showImage(String url, CircleImageView imgView){
+        if(url!=null&&url.isEmpty()==false){
+            int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+            Glide.with(mActivity).load(url).override(width*1/2, width*2/3).
+                    centerCrop().into(imgView);
+        }
+    }
+    public void popupImage(CircleImageView imgView,String url){
+//        Picasso.setSingletonInstance(new Picasso.Builder(this).build()); // Only needed if you are using Picasso
+        final ImagePopup imagePopup = new ImagePopup(mActivity);
+        imagePopup.setWindowHeight(500); // Optional
+        imagePopup.setWindowWidth(500); // Optional
+        imagePopup.setBackgroundColor(Color.TRANSPARENT);  // Optional
+//        imagePopup.setFullScreen(true); // Optional
+        imagePopup.setHideCloseIcon(true);  // Optional
+        imagePopup.setImageOnClickClose(true);  // Optional
+//        if(url!=null)
+//            imagePopup.initiatePopupWithGlide(url);
+//        else
+        imagePopup.initiatePopup(imgView.getDrawable()); // Load Image from Drawable
+
+        imagePopup.viewPopup();
+
     }
 }

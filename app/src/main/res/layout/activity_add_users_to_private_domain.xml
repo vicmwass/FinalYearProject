@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.AddUsersToPrivateDomain.AddUsersToPrivateDomainActivity">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        />
+    <androidx.appcompat.widget.SearchView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/action_search"
+        android:layout_below="@+id/toolbar"
+        android:focusable="false"/>
+    <!--    <com.google.android.material.textfield.TextInputLayout-->
+    <!--        android:id="@+id/wraper_admin_name"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_marginTop="@dimen/margin_to_top"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_below="@+id/toolbar"-->
+    <!--        android:layout_marginStart="@dimen/margin_start"-->
+    <!--        android:layout_marginEnd="@dimen/margin_start"-->
+    <!--        >-->
+    <!--        <EditText-->
+    <!--            android:id="@+id/et_admin_name"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:hint="Enter Email of User"-->
+    <!--            android:inputType="textNoSuggestions"-->
+    <!--            android:maxLines="1"-->
+    <!--            android:layout_margin="@dimen/edit_text_margin"-->
+    <!--            android:textAlignment="center"-->
+    <!--            android:singleLine="true"-->
+    <!--            />-->
+
+    <!--    </com.google.android.material.textfield.TextInputLayout>-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/add_member_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/action_search" />
+</RelativeLayout>
